@@ -1,10 +1,27 @@
 import type { ReactNode } from 'react';
 
-export function EmptyState({ title, hint }: { title: string; hint?: string }) {
+export function EmptyState({
+  title,
+  hint,
+  icon,
+  action,
+}: {
+  title: string;
+  hint?: string;
+  /** DESIGN_SYSTEM §20.1 — an SVG icon, never an emoji. Optional; layout is unaffected if omitted. */
+  icon?: ReactNode;
+  action?: ReactNode;
+}) {
   return (
     <div className="rounded-lg border border-dashed border-[var(--line)] bg-white px-6 py-12 text-center">
+      {icon && (
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--muted)]">
+          {icon}
+        </div>
+      )}
       <p className="text-sm font-medium text-[var(--ink)]">{title}</p>
       {hint && <p className="mt-1 text-sm text-[var(--muted)]">{hint}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
@@ -37,7 +54,7 @@ export function ErrorState({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 text-sm font-medium text-[var(--accent)] underline"
+          className="mt-3 inline-flex h-8 cursor-pointer items-center rounded-md px-3 text-sm font-medium text-[var(--accent)] underline underline-offset-2 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
         >
           Retry
         </button>
@@ -72,7 +89,7 @@ export function StatStrip({
   items: Array<{ label: string; value: string | number }>;
 }) {
   return (
-    <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
       {items.map((item) => (
         <div
           key={item.label}

@@ -233,7 +233,7 @@ async function seedAttendance(employeeId: string, daysBack: number, missingCheck
   }
 }
 
-async function main() {
+async function main(force = false) {
   console.log('Seeding Dayflow…');
 
   const eng = await prisma.department.upsert({
@@ -357,7 +357,52 @@ async function main() {
     );
   }
 
-  // Clear and reseed attendance/leave for idempotent demo story
+  // Attendance/leave/notification/audit are real operational data once the app is in
+  // use — never destroy them on a routine restart. Only (re)seed this demo activity when
+  // those tables are genuinely empty (a fresh database), or when explicitly forced via
+  // `npm run db:reset`. See docs/QA_BACKLOG.md DF-001.
+  const [attendanceEventCount, leaveRequestCount, notificationCount, auditLogCount] =
+    await Promise.all([
+      prisma.attendanceEvent.count(),
+      prisma.leaveRequest.count(),
+      prisma.notification.count(),
+      prisma.auditLog.count(),
+    ]);
+  const hasExistingActivity =
+    attendanceEventCount > 0 ||
+    leaveRequestCount > 0 ||
+    notificationCount > 0 ||
+    auditLogCount > 0;
+
+  if (hasExistingActivity && !force) {
+    console.log(
+      'Existing attendance/leave/notification/audit data found — skipping demo activity seed to avoid overwriting it.'
+    );
+    console.log('Seed complete (reference data + accounts only).');
+    return;
+  }
+
+  await seedDemoActivity({ leaveTypes, priya, rahul, createdOthers });
+
+  console.log('Seed complete.');
+  console.log('Demo logins (password for all: Password@123)');
+  console.log('  HR Admin : priya@dayflow.local  /  PS2026001');
+  console.log('  Employee : rahul@dayflow.local  /  RV2026002');
+}
+
+async function seedDemoActivity({
+  leaveTypes,
+  priya,
+  rahul,
+  createdOthers,
+}: {
+  leaveTypes: Awaited<ReturnType<typeof upsertLeaveTypes>>;
+  priya: Awaited<ReturnType<typeof createPerson>>;
+  rahul: Awaited<ReturnType<typeof createPerson>>;
+  createdOthers: Awaited<ReturnType<typeof createPerson>>[];
+}) {
+  // Destructive — only reached for a fresh database (see main()) or an explicit
+  // `npm run db:reset`. Never reached on a routine boot/restart of a live deployment.
   await prisma.attendanceEvent.deleteMany();
   await prisma.attendanceDaySummary.deleteMany();
   await prisma.leaveRequest.deleteMany();
@@ -449,11 +494,6 @@ async function main() {
       },
     ],
   });
-
-  console.log('Seed complete.');
-  console.log('Demo logins (password for all: Password@123)');
-  console.log('  HR Admin : priya@dayflow.local  /  PS2026001');
-  console.log('  Employee : rahul@dayflow.local  /  RV2026002');
 }
 
 function oBasic(
@@ -467,7 +507,12 @@ function oBasic(
   return others.find((o) => o.employeeCode === code)?.basic ?? 40000;
 }
 
-main()
+// `npm run db:reset` passes --reset to force-clear and reseed attendance, leave,
+// notifications and the audit log even when they already contain data. A routine
+// `npm run prisma:seed` (also what runs on every container boot) never does this.
+const forceReset = process.argv.includes('--reset');
+
+main(forceReset)
   .catch((e) => {
     console.error(e);
     process.exit(1);
