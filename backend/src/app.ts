@@ -12,6 +12,8 @@ import payrollRoutes from './modules/payroll/payroll.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import dashboardRoutes from './modules/dashboard/dashboard.routes';
 import auditRoutes from './modules/audit/audit.routes';
+import filesRoutes from './modules/files/files.routes';
+import companyRoutes from './modules/company/company.routes';
 
 export function createApp() {
   const app = express();
@@ -23,7 +25,7 @@ export function createApp() {
       credentials: true,
     })
   );
-  app.use(express.json({ limit: '1mb' }));
+  app.use(express.json({ limit: '6mb' }));
   app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
   app.get('/health', (_req, res) => {
@@ -38,6 +40,8 @@ export function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/audit-logs', auditRoutes);
+  app.use('/api/files', filesRoutes);
+  app.use('/api/company', companyRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

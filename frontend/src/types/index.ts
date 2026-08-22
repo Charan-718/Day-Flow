@@ -20,6 +20,7 @@ export interface AuthUser {
   employeeId: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  mustChangePassword?: boolean;
 }
 
 export interface EmployeeListItem {
@@ -39,7 +40,9 @@ export interface EmployeeListItem {
     checkIn: string | null;
     checkOut: string | null;
     isCheckedIn: boolean;
+    presence?: 'present' | 'on_leave' | 'absent';
   };
+  presence?: 'present' | 'on_leave' | 'absent';
 }
 
 export interface LeaveType {

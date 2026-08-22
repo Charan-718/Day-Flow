@@ -5,6 +5,7 @@ import {
   createLeaveRequest,
   getLeaveBalance,
   getLeaveTypes,
+  getPublicHolidays,
   listLeaveRequests,
   rejectLeave,
 } from '../../services/leave';
@@ -12,6 +13,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { StatusBadge } from '../../components/StatusBadge';
+import { LeaveCalendar } from '../../components/LeaveCalendar';
 import {
   EmptyState,
   ErrorState,
@@ -19,6 +21,7 @@ import {
   PageHeader,
   StatStrip,
 } from '../../components/ui';
+import { uploadFile } from '../../services/files';
 import { getApiError } from '../../api/client';
 import type { LeaveRequest } from '../../types';
 
@@ -44,6 +47,12 @@ export function TimeOffPage() {
   const requests = useQuery({
     queryKey: ['leave-requests'],
     queryFn: () => listLeaveRequests(isAdmin ? { status: undefined } : undefined),
+  });
+  const calendarYear = new Date().getFullYear();
+  const holidays = useQuery({
+    queryKey: ['public-holidays', calendarYear],
+    queryFn: () => getPublicHolidays(calendarYear),
+    enabled: !isAdmin,
   });
 
   const [form, setForm] = useState({
@@ -125,6 +134,20 @@ export function TimeOffPage() {
             value: `${b.availableDays} days`,
           }))}
         />
+      )}
+
+      {!isAdmin && requests.data && (
+        <div className="mb-6">
+          {holidays.isLoading ? (
+            <LoadingSkeleton rows={4} />
+          ) : (
+            <LeaveCalendar
+              year={calendarYear}
+              requests={requests.data.items}
+              holidays={holidays.data || []}
+            />
+          )}
+        </div>
       )}
 
       {requests.isLoading && <LoadingSkeleton />}
@@ -294,16 +317,23 @@ export function TimeOffPage() {
           {selectedType?.requiresAttachment && (
             <label className="block text-sm">
               <span className="mb-1 block font-medium">
-                Attachment URL (required for Sick Leave)
+                Attachment (required for Sick Leave certificate)
               </span>
               <input
-                required
-                type="url"
-                placeholder="https://…"
-                className="w-full rounded-md border border-[var(--line)] px-3 py-2"
-                value={form.attachmentUrl}
-                onChange={(e) => setForm({ ...form, attachmentUrl: e.target.value })}
+                type="file"
+                accept=".pdf,image/*"
+                required={!form.attachmentUrl}
+                className="w-full text-sm"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const url = await uploadFile(file);
+                  setForm({ ...form, attachmentUrl: url });
+                }}
               />
+              {form.attachmentUrl && (
+                <span className="mt-1 block text-xs text-[var(--success)]">Uploaded ✓</span>
+              )}
             </label>
           )}
           <label className="block text-sm">

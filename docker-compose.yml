@@ -1,14 +1,16 @@
+# Docker defaults are embedded below so `docker compose up --build` works without a .env file.
+# Copy .env.example → .env only when you want to override values for local/production.
 services:
   db:
     image: postgres:16-alpine
     container_name: dayflow-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: dayflow
-      POSTGRES_PASSWORD: dayflow
-      POSTGRES_DB: dayflow
+      POSTGRES_USER: ${POSTGRES_USER:-dayflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dayflow}
+      POSTGRES_DB: ${POSTGRES_DB:-dayflow}
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - dayflow_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -24,16 +26,24 @@ services:
     container_name: dayflow-backend
     restart: unless-stopped
     environment:
-      NODE_ENV: production
-      PORT: 4000
-      DATABASE_URL: postgresql://dayflow:dayflow@db:5432/dayflow?schema=public
-      JWT_SECRET: dayflow-hackathon-jwt-secret-change-in-prod
-      JWT_EXPIRES_IN: 2h
-      CORS_ORIGIN: http://localhost:5173
-      BCRYPT_ROUNDS: "12"
-      LATE_CHECKIN_THRESHOLD: "10:30"
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-4000}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dayflow}:${POSTGRES_PASSWORD:-dayflow}@db:5432/${POSTGRES_DB:-dayflow}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-dayflow-local-docker-jwt-secret-min-32-chars}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-2h}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      LATE_CHECKIN_THRESHOLD: ${LATE_CHECKIN_THRESHOLD:-10:30}
+      COMPANY_NAME: ${COMPANY_NAME:-Dayflow}
+      COMPANY_CODE: ${COMPANY_CODE:-DF}
+      BOOTSTRAP_HR_EMAIL: ${BOOTSTRAP_HR_EMAIL:-hr.admin@dayflow.local}
+      BOOTSTRAP_HR_PASSWORD: ${BOOTSTRAP_HR_PASSWORD:-ChangeMeOnFirstLogin!}
+      BOOTSTRAP_HR_FIRST_NAME: ${BOOTSTRAP_HR_FIRST_NAME:-HR}
+      BOOTSTRAP_HR_LAST_NAME: ${BOOTSTRAP_HR_LAST_NAME:-Administrator}
+      RUN_SEED_ON_START: ${RUN_SEED_ON_START:-true}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
     ports:
-      - "4000:4000"
+      - "${PORT:-4000}:4000"
     depends_on:
       db:
         condition: service_healthy
@@ -43,7 +53,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: /api
+        VITE_API_URL: ${VITE_API_URL:-/api}
     container_name: dayflow-frontend
     restart: unless-stopped
     ports:

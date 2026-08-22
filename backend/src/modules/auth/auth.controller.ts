@@ -13,7 +13,12 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function createEmployee(req: Request, res: Response, next: NextFunction) {
   try {
-    const data = await authService.createEmployee(req.body, req.user!.userId, req.clientIp);
+    const data = await authService.createEmployee(
+      req.body,
+      req.user!.userId,
+      req.user!.role,
+      req.clientIp
+    );
     return sendSuccess(res, data, 'Employee created successfully', 201);
   } catch (err) {
     return next(err);
@@ -40,4 +45,17 @@ export async function me(req: Request, res: Response, next: NextFunction) {
 
 export async function logout(_req: Request, res: Response) {
   return sendSuccess(res, null, 'Logged out');
+}
+
+export async function changePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await authService.changePassword(
+      req.user!.userId,
+      req.body,
+      req.clientIp
+    );
+    return sendSuccess(res, data, 'Password updated');
+  } catch (err) {
+    return next(err);
+  }
 }

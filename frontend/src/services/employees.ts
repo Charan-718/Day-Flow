@@ -43,3 +43,11 @@ export async function getSalary(id: string) {
   const { data } = await api.get(`/employees/${id}/salary`);
   return data.data;
 }
+
+export async function uploadDocument(
+  employeeId: string,
+  body: { label: string; fileName: string; dataBase64: string }
+) {
+  const { data } = await api.post(`/employees/${employeeId}/documents`, body);
+  return data.data;
+}

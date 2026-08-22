@@ -24,5 +24,6 @@ router.patch(
   validate(updateEmployeeSchema),
   controller.update
 );
+router.post('/:id/documents', requireSelfOrAdmin('id'), controller.addDocument);
 
 export default router;

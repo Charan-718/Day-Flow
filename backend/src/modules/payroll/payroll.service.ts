@@ -3,21 +3,22 @@ import { prisma } from '../../config/prisma';
 import { AppError, assertFound } from '../../utils/errors';
 import { AuthUser } from '../../middleware/requireAuth';
 import { writeAuditLog } from '../../utils/auditWriter';
+import { calculateSalaryComponents } from '../../utils/salaryCalculator';
+import { computePayableDays } from '../../utils/payableDays';
 import { z } from 'zod';
 import { upsertSalarySchema } from './payroll.schema';
 
 type UpsertInput = z.infer<typeof upsertSalarySchema>;
 
 function assertCanViewSalary(employeeId: string, actor: AuthUser) {
-  const isAdmin = actor.role === Role.HR_ADMIN;
-  const isSelf = actor.employeeId === employeeId;
-  if (!isAdmin && !isSelf) {
+  if (actor.role !== Role.HR_ADMIN) {
     throw new AppError(
-      'You cannot view this employee\'s salary',
+      'Salary information is only visible to HR Admin',
       'FORBIDDEN',
       403
     );
   }
+  void employeeId;
 }
 
 export async function getSalary(employeeId: string, actor: AuthUser) {
@@ -152,4 +153,70 @@ export async function upsertSalary(
       })),
     };
   });
+}
+
+export async function upsertSalaryFromWage(
+  employeeId: string,
+  monthlyWage: number,
+  workingDaysPerWeek: number,
+  breakTimeMinutes: number,
+  actor: AuthUser,
+  ipAddress?: string
+) {
+  const calc = calculateSalaryComponents(monthlyWage);
+  return upsertSalary(
+    employeeId,
+    {
+      monthlyWage,
+      yearlyWage: calc.yearlyWage,
+      workingDaysPerWeek,
+      breakTimeMinutes,
+      components: calc.components
+        .filter((c) => !c.name.includes('Employer') && c.name !== 'Professional Tax')
+        .map((c) => ({
+          name: c.name,
+          basis: c.basis as 'FIXED' | 'PERCENT_OF_BASIC',
+          percentage: c.percentage,
+          amount: c.amount,
+        })),
+    },
+    actor,
+    ipAddress
+  );
+}
+
+export async function getPayslipPreview(
+  employeeId: string,
+  actor: AuthUser,
+  month?: number,
+  year?: number
+) {
+  const isAdmin = actor.role === Role.HR_ADMIN;
+  const isSelf = actor.employeeId === employeeId;
+  if (!isAdmin && !isSelf) {
+    throw new AppError('You cannot view this payslip preview', 'FORBIDDEN', 403);
+  }
+
+  assertFound(
+    await prisma.employee.findUnique({ where: { id: employeeId } }),
+    'Employee not found'
+  );
+
+  const now = new Date();
+  const m = month ?? now.getUTCMonth() + 1;
+  const y = year ?? now.getUTCFullYear();
+  const payable = await computePayableDays(employeeId, m, y);
+  const structure = await prisma.salaryStructure.findUnique({
+    where: { employeeId },
+    include: { components: true },
+  });
+
+  return {
+    ...payable,
+    hasSalaryStructure: Boolean(structure),
+    components: structure?.components.map((c) => ({
+      name: c.name,
+      amount: Number(c.amount),
+    })),
+  };
 }

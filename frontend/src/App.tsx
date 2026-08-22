@@ -4,6 +4,7 @@ import { AuthProvider } from './hooks/useAuth';
 import { AppShell, AuthLayout } from './layouts/AppShell';
 import { RequireAuth, RequireRole, RoleLanding } from './routes/guards';
 import { LoginPage } from './pages/auth/Login';
+import { ChangePasswordPage } from './pages/auth/ChangePassword';
 import { EmployeeDirectory } from './pages/employees/EmployeeDirectory';
 import { EmployeeProfile } from './pages/employees/EmployeeProfile';
 import { Employee360Page } from './pages/employees/Employee360';
@@ -26,6 +27,7 @@ export default function App() {
           <Routes>
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/change-password" element={<ChangePasswordPage />} />
             </Route>
 
             <Route element={<RequireAuth />}>

@@ -2,11 +2,12 @@ import { AttendanceStatus, LeaveStatus, Role } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { AuthUser } from '../../middleware/requireAuth';
 import { todayUtc } from '../../utils/dates';
-import { getTodayStatus } from '../attendance/attendance.service';
+import { getTodayStatus, flagMissingCheckouts } from '../attendance/attendance.service';
 import { AppError } from '../../utils/errors';
 
 export async function getSummary(actor: AuthUser) {
   if (actor.role === Role.HR_ADMIN) {
+    await flagMissingCheckouts();
     const today = todayUtc();
     const [headcount, pendingLeaveCount, presentToday] = await Promise.all([
       prisma.employee.count({ where: { employmentStatus: 'ACTIVE' } }),

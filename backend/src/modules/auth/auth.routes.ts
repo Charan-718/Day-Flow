@@ -4,7 +4,7 @@ import { Role } from '@prisma/client';
 import * as controller from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { requireAuth, requireRole } from '../../middleware/requireAuth';
-import { createEmployeeSchema, loginSchema, verifyEmailSchema } from './auth.schema';
+import { createEmployeeSchema, loginSchema, verifyEmailSchema, changePasswordSchema } from './auth.schema';
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -27,5 +27,11 @@ router.post(
 );
 router.get('/me', requireAuth, controller.me);
 router.post('/logout', requireAuth, controller.logout);
+router.post(
+  '/change-password',
+  requireAuth,
+  validate(changePasswordSchema),
+  controller.changePassword
+);
 
 export default router;

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { listEmployees, createEmployee, listDepartments } from '../../services/employees';
 import { getDashboardSummary } from '../../services/admin';
 import { useAuth } from '../../hooks/useAuth';
-import { AttendanceDot } from '../../components/StatusBadge';
+import { PresenceIndicator } from '../../components/StatusBadge';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import {
@@ -23,6 +23,7 @@ export function EmployeeDirectory() {
   const [createdCreds, setCreatedCreds] = useState<{
     loginId: string;
     temporaryPassword: string;
+    assignedRole?: string;
   } | null>(null);
   const qc = useQueryClient();
 
@@ -49,6 +50,7 @@ export function EmployeeDirectory() {
     designation: '',
     departmentId: '',
     joiningDate: new Date().toISOString().slice(0, 10),
+    monthlyWage: '',
   });
 
   const create = useMutation({
@@ -56,12 +58,13 @@ export function EmployeeDirectory() {
       createEmployee({
         ...form,
         departmentId: form.departmentId || null,
-        role: 'EMPLOYEE',
+        monthlyWage: form.monthlyWage ? Number(form.monthlyWage) : undefined,
       }),
     onSuccess: (res) => {
       setCreatedCreds({
         loginId: res.loginId,
         temporaryPassword: res.temporaryPassword,
+        assignedRole: (res as { assignedRole?: string }).assignedRole,
       });
       void qc.invalidateQueries({ queryKey: ['employees'] });
       void qc.invalidateQueries({ queryKey: ['dashboard-summary'] });
@@ -111,12 +114,24 @@ export function EmployeeDirectory() {
             className="group relative rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)] transition hover:border-[var(--accent)]"
           >
             <span className="absolute right-3 top-3">
-              <AttendanceDot checkedIn={emp.todayAttendance.isCheckedIn} />
+              <PresenceIndicator
+                presence={emp.presence || emp.todayAttendance.presence || 'absent'}
+              />
             </span>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">
-                {emp.firstName[0]}
-                {emp.lastName[0]}
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">
+                {emp.profilePictureUrl ? (
+                  <img
+                    src={String(emp.profilePictureUrl)}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <>
+                    {emp.firstName[0]}
+                    {emp.lastName[0]}
+                  </>
+                )}
               </div>
               <div>
                 <p className="font-semibold group-hover:text-[var(--accent)]">
@@ -140,10 +155,14 @@ export function EmployeeDirectory() {
         {createdCreds ? (
           <div className="space-y-3 text-sm">
             <p>Share these credentials with the new hire:</p>
-            <div className="rounded-md bg-[var(--bg)] p-3 font-mono">
+            <div className="rounded-md bg-[var(--bg)] p-3 font-mono text-xs">
               <p>Login ID: {createdCreds.loginId}</p>
+              <p>Role: {createdCreds.assignedRole || 'EMPLOYEE'}</p>
               <p>Temp password: {createdCreds.temporaryPassword}</p>
             </div>
+            <p className="text-xs text-[var(--muted)]">
+              HR department or HR job title automatically receives HR Admin access.
+            </p>
             <Button onClick={() => setOpen(false)}>Done</Button>
           </div>
         ) : (
@@ -196,6 +215,18 @@ export function EmployeeDirectory() {
                 </option>
               ))}
             </select>
+            <input
+              type="number"
+              min={0}
+              placeholder="Monthly wage (₹) — optional"
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.monthlyWage}
+              onChange={(e) => setForm({ ...form, monthlyWage: e.target.value })}
+            />
+            <p className="text-xs text-[var(--muted)]">
+              Role is assigned automatically: Human Resources → HR Admin, all other departments →
+              Employee.
+            </p>
             <input
               type="date"
               required

@@ -19,3 +19,11 @@ export async function fetchMe() {
 export async function logout() {
   await api.post('/auth/logout');
 }
+
+export async function changePassword(currentPassword: string, newPassword: string) {
+  const { data } = await api.post('/auth/change-password', {
+    currentPassword,
+    newPassword,
+  });
+  return data.data;
+}

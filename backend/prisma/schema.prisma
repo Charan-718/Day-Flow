@@ -18,16 +18,26 @@ enum AccountStatus {
   SUSPENDED
 }
 
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique @db.VarChar(4)
+  logoUrl   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
-  id              String        @id @default(uuid())
-  loginId         String        @unique
-  email           String        @unique
-  passwordHash    String
-  role            Role
-  status          AccountStatus @default(PENDING_ACTIVATION)
-  emailVerifiedAt DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                 String        @id @default(uuid())
+  loginId            String        @unique
+  email              String        @unique
+  passwordHash       String
+  role               Role
+  status             AccountStatus @default(PENDING_ACTIVATION)
+  mustChangePassword Boolean       @default(true)
+  emailVerifiedAt    DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   employee      Employee?
   auditLogs     AuditLog[]    @relation("ActorAuditLogs")
@@ -40,7 +50,16 @@ model User {
 model Department {
   id        String     @id @default(uuid())
   name      String     @unique
+  isHrTeam  Boolean    @default(false)
   employees Employee[]
+}
+
+model PublicHoliday {
+  id   String   @id @default(uuid())
+  name String
+  date DateTime @unique @db.Date
+
+  @@index([date])
 }
 
 model Employee {

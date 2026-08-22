@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         employeeId: me.employeeId,
         firstName: (me as { employee?: { firstName?: string } }).employee?.firstName,
         lastName: (me as { employee?: { lastName?: string } }).employee?.lastName,
+        mustChangePassword: (me as { mustChangePassword?: boolean }).mustChangePassword,
       });
     } catch {
       localStorage.removeItem('dayflow_token');
