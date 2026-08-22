@@ -16,18 +16,46 @@
   --warning-soft: #fffaeb;
   --success: #067647;
   --success-soft: #ecfdf3;
+  /* DESIGN_SYSTEM §1.2 — separates "on leave" from --accent so links/primary actions
+     stay the only thing that reads as interactive. Verified 5.99:1 / 5.43:1 on soft. */
+  --info: #175cd3;
+  --info-soft: #eff4ff;
   --nav: #142033;
   --nav-text: #e8eef5;
   --nav-muted: #9aabbd;
   --shadow: 0 1px 2px rgba(20, 32, 51, 0.06);
+  --shadow-md: 0 8px 16px rgba(20, 32, 51, 0.1), 0 2px 4px rgba(20, 32, 51, 0.06);
+  --shadow-lg: 0 20px 32px rgba(20, 32, 51, 0.16), 0 4px 8px rgba(20, 32, 51, 0.08);
+  /* DESIGN_SYSTEM §1.2 — control boundaries need 3:1 contrast; --line (1.35:1) is for
+     decorative dividers only. Verified 3.48:1 on white, 3.19:1 on canvas. */
+  --border-control: #7d8b9a;
   font-family: 'IBM Plex Sans', system-ui, sans-serif;
   color: var(--ink);
   background: var(--bg);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* DESIGN_SYSTEM §10 — baseline focus indicator for any interactive element that doesn't
+   define its own Tailwind focus-visible ring. Never removes an existing ring; the two can
+   coexist harmlessly where a component also sets one explicitly. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {
