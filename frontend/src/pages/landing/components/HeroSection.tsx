@@ -78,11 +78,11 @@ export default function HeroSection() {
               width: '38px',
               height: '38px',
               borderRadius: '0 0 8px 8px',
-              background: 'var(--color-night-bordeaux)',
-              color: 'var(--color-text-white)',
-              border: '2px solid var(--color-night-bordeaux)',
+              background: 'var(--color-powder-blue)',
+              color: 'var(--color-background-deep)',
+              border: '2px solid var(--color-powder-blue)',
               borderTop: 'none',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: 'var(--glow-cyan)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -151,11 +151,11 @@ export default function HeroSection() {
             <Link
               to="/login?role=hr"
               onMouseEnter={() => setActiveRole('admin')}
-              className="landing-vibrant-card"
+              className="landing-vibrant-card landing-card-shine"
               style={{
                 position: 'absolute',
                 top: '0.5rem',
-                left: '10%',
+                left: '13%',
                 zIndex: 10,
                 cursor: 'pointer',
                 padding: '0.65rem 1.25rem',
@@ -179,7 +179,7 @@ export default function HeroSection() {
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 <circle cx="12" cy="11" r="3" />
               </svg>
-              <span>Admin / HR Officer</span>
+              <span className="landing-text-blink">Admin / HR Officer</span>
             </Link>
 
             {/* LEFT CONNECTING LINE POINTER (ADMIN CARD -> MONITOR SCREEN) */}
@@ -187,7 +187,7 @@ export default function HeroSection() {
               style={{
                 position: 'absolute',
                 top: '1.6rem',
-                left: 'calc(7% + 108px)',
+                left: 'calc(10% + 168px)',
                 width: '240px',
                 height: '180px',
                 zIndex: 9,
@@ -211,7 +211,7 @@ export default function HeroSection() {
             <Link
               to="/login?role=employee"
               onMouseEnter={() => setActiveRole('employee')}
-              className="landing-vibrant-card"
+              className="landing-vibrant-card landing-card-shine"
               style={{
                 position: 'absolute',
                 top: '0.5rem',
@@ -239,15 +239,15 @@ export default function HeroSection() {
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
-              <span>Employee Portal</span>
+              <span className="landing-text-blink">Employee Portal</span>
             </Link>
 
             {/* RIGHT CONNECTING LINE POINTER (EMPLOYEE CARD -> PC TOWER) */}
             <svg
               style={{
                 position: 'absolute',
-                top: '1.6rem',
-                right: 'calc(24% + 75px)',
+                top: '1rem',
+                right: 'calc(24% + 125px)',
                 width: '200px',
                 height: '180px',
                 zIndex: 9,

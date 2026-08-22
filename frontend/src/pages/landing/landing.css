@@ -122,8 +122,8 @@
   /* ==========================================================================
      3. TYPOGRAPHY
      ========================================================================== */
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Squared', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Squared', 'Outfit', 'Plus Jakarta Sans', sans-serif;
 
   --font-size-xs: 0.75rem;       /* 12px */
   --font-size-sm: 0.875rem;      /* 14px */
@@ -437,6 +437,40 @@
 @keyframes squarePulse {
   0% { transform: scale(0.6); opacity: 0.6; }
   100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* SHINE & BLINK UTILITIES FOR CARDS */
+.landing-card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-card-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-25deg);
+  animation: shineSweep 4.5s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes shineSweep {
+  0% { left: -100%; }
+  15% { left: 200%; }
+  100% { left: 200%; }
+}
+
+.landing-text-blink {
+  animation: textBlinkRadiumWhite 3s infinite alternate ease-in-out;
+}
+
+@keyframes textBlinkRadiumWhite {
+  0%, 10% { color: var(--color-text-white); text-shadow: none; }
+  90%, 100% { color: var(--color-powder-blue); text-shadow: 0 0 8px rgba(176, 255, 61, 0.6); }
 }
 
 /* HIDE DEFAULT MODEL VIEWER PROGRESS BAR LINE */
