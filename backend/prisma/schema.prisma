@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  HR_ADMIN
+}
+
+enum AccountStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  SUSPENDED
+}
+
+model User {
+  id              String        @id @default(uuid())
+  loginId         String        @unique
+  email           String        @unique
+  passwordHash    String
+  role            Role
+  status          AccountStatus @default(PENDING_ACTIVATION)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  employee      Employee?
+  auditLogs     AuditLog[]    @relation("ActorAuditLogs")
+  notifications Notification[]
+
+  @@index([email])
+  @@index([loginId])
+}
+
+model Department {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Employee {
+  id                String  @id @default(uuid())
+  userId            String  @unique
+  user              User    @relation(fields: [userId], references: [id])
+
+  firstName         String
+  lastName          String
+  employeeCode      String  @unique
+  profilePictureUrl String?
+  phone             String?
+  personalEmail     String?
+  address           String?
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  designation  String?
+  managerId    String?
+  manager      Employee?  @relation("ManagerReports", fields: [managerId], references: [id])
+  reports      Employee[] @relation("ManagerReports")
+
+  joiningDate      DateTime
+  employmentStatus String   @default("ACTIVE")
+
+  dateOfBirth       DateTime?
+  gender            String?
+  maritalStatus     String?
+  nationality       String?
+  bankName          String?
+  bankAccountNumber String?
+  ifscCode          String?
+  panNumber         String?
+  uanNumber         String?
+
+  bio            String?
+  jobLoveNote    String?
+  interests      String?
+  skills         String[] @default([])
+  certifications String[] @default([])
+
+  attendanceEvents AttendanceEvent[]
+  attendanceDays   AttendanceDaySummary[]
+  leaveRequests    LeaveRequest[]
+  leaveBalances    LeaveBalance[]
+  salaryStructure  SalaryStructure?
+  documents        EmployeeDocument[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([managerId])
+  @@index([lastName, firstName])
+}
+
+model EmployeeDocument {
+  id         String   @id @default(uuid())
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  label      String
+  fileUrl    String
+  uploadedAt DateTime @default(now())
+
+  @@index([employeeId])
+}
+
+enum AttendanceEventType {
+  CHECK_IN
+  CHECK_OUT
+}
+
+model AttendanceEvent {
+  id         String              @id @default(uuid())
+  employeeId String
+  employee   Employee            @relation(fields: [employeeId], references: [id])
+  type       AttendanceEventType
+  occurredAt DateTime            @default(now())
+
+  @@index([employeeId, occurredAt])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+  LEAVE
+}
+
+model AttendanceDaySummary {
+  id            String           @id @default(uuid())
+  employeeId    String
+  employee      Employee         @relation(fields: [employeeId], references: [id])
+  date          DateTime         @db.Date
+  checkIn       DateTime?
+  checkOut      DateTime?
+  workedMinutes Int?
+  status        AttendanceStatus
+  isException   Boolean          @default(false)
+
+  @@unique([employeeId, date])
+  @@index([date])
+  @@index([employeeId, date])
+}
+
+enum LeaveTypeCode {
+  PAID
+  SICK
+  UNPAID
+}
+
+model LeaveType {
+  id                 String        @id @default(uuid())
+  code               LeaveTypeCode @unique
+  name               String
+  requiresAttachment Boolean       @default(false)
+  leaveRequests      LeaveRequest[]
+  balances           LeaveBalance[]
+}
+
+model LeaveBalance {
+  id            String    @id @default(uuid())
+  employeeId    String
+  employee      Employee  @relation(fields: [employeeId], references: [id])
+  leaveTypeId   String
+  leaveType     LeaveType @relation(fields: [leaveTypeId], references: [id])
+  allocatedDays Decimal   @db.Decimal(5, 2)
+  usedDays      Decimal   @db.Decimal(5, 2) @default(0)
+
+  @@unique([employeeId, leaveTypeId])
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model LeaveRequest {
+  id          String    @id @default(uuid())
+  employeeId  String
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  leaveTypeId String
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  startDate     DateTime @db.Date
+  endDate       DateTime @db.Date
+  daysRequested Decimal  @db.Decimal(5, 2)
+  remarks       String?
+  attachmentUrl String?
+
+  status        LeaveStatus @default(PENDING)
+  reviewedById  String?
+  reviewComment String?
+  reviewedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([employeeId, status])
+  @@index([status])
+  @@index([startDate, endDate])
+}
+
+model SalaryStructure {
+  id                 String            @id @default(uuid())
+  employeeId         String            @unique
+  employee           Employee          @relation(fields: [employeeId], references: [id])
+  monthlyWage        Decimal           @db.Decimal(12, 2)
+  yearlyWage         Decimal           @db.Decimal(12, 2)
+  workingDaysPerWeek Int               @default(5)
+  breakTimeMinutes   Int               @default(60)
+  components         SalaryComponent[]
+  updatedAt          DateTime          @updatedAt
+}
+
+enum ComponentBasis {
+  FIXED
+  PERCENT_OF_BASIC
+}
+
+model SalaryComponent {
+  id                String          @id @default(uuid())
+  salaryStructureId String
+  salaryStructure   SalaryStructure @relation(fields: [salaryStructureId], references: [id], onDelete: Cascade)
+  name              String
+  basis             ComponentBasis
+  percentage        Decimal?        @db.Decimal(5, 2)
+  amount            Decimal         @db.Decimal(12, 2)
+
+  @@index([salaryStructureId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  actorId       String
+  actor         User     @relation("ActorAuditLogs", fields: [actorId], references: [id])
+  action        String
+  entityType    String
+  entityId      String
+  previousValue Json?
+  newValue      Json?
+  ipAddress     String?
+  createdAt     DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+}
