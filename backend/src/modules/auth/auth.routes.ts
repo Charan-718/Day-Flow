@@ -44,6 +44,12 @@ router.post(
   validate(createEmployeeSchema),
   controller.createEmployee
 );
+router.post(
+  '/employees/:id/reset-password',
+  requireAuth,
+  requireRole(Role.HR_ADMIN),
+  controller.resetEmployeePassword
+);
 router.get('/me', requireAuth, controller.me);
 router.post('/logout', requireAuth, controller.logout);
 router.post(

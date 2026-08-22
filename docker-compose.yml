@@ -44,6 +44,11 @@ services:
       SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
     ports:
       - "${PORT:-4000}:4000"
+    volumes:
+      # Uploaded files (avatars, company logo, resumes/certificates) live on disk at
+      # /app/uploads while the DB rows referencing them live in dayflow_pgdata — without
+      # this volume, every rebuild wipes the files but keeps the URLs, breaking every image.
+      - dayflow_uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -63,3 +68,4 @@ services:
 
 volumes:
   dayflow_pgdata:
+  dayflow_uploads:

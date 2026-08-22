@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-export default function Navbar({ onOpenDemo }: { onOpenDemo: () => void }) {
+const DEMO_URL = 'https://drive.google.com/drive/folders/1v-TmT90R80MpL3KweY0_ie3kXrwHCmLz?usp=sharing';
+
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -84,8 +86,10 @@ export default function Navbar({ onOpenDemo }: { onOpenDemo: () => void }) {
               Sign in as Employee
             </Link>
           </nav>
-          <button
-            onClick={onOpenDemo}
+          <a
+            href={DEMO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="landing-btn-secondary"
             style={{ padding: '0.65rem 1.35rem', fontSize: '0.95rem' }}
           >
@@ -93,7 +97,7 @@ export default function Navbar({ onOpenDemo }: { onOpenDemo: () => void }) {
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
             Watch Demo
-          </button>
+          </a>
           <a
             href="#pricing"
             className="landing-btn-primary"

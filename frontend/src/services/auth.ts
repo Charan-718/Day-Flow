@@ -52,3 +52,12 @@ export async function getRegistrationStatus() {
   const { data } = await api.get<ApiSuccess<{ open: boolean }>>('/auth/registration-status');
   return data.data;
 }
+
+/** HR-only — there's no self-service email reset, so HR relays this temporary password
+ * directly to the employee. Forces a password change on their next login. */
+export async function resetEmployeePassword(employeeId: string) {
+  const { data } = await api.post<
+    ApiSuccess<{ loginId: string; email: string; temporaryPassword: string }>
+  >(`/auth/employees/${employeeId}/reset-password`);
+  return data.data;
+}

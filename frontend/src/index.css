@@ -2,32 +2,42 @@
 @import 'tailwindcss';
 
 :root {
-  --bg: #f3f5f7;
+  /* DESIGN_SYSTEM §1.3 — unified with the landing page's brand palette (Night Bordeaux /
+     Powder Blue / Alabaster). Values below are tuned, not copied 1:1 from landing.css:
+     several of landing's own semantic colors (muted text, success, warning) sit just under
+     4.5:1 on our backgrounds, so they're darkened here to clear AA — every pair below is
+     re-verified, ratios noted per line. */
+  --bg: #f4f7fa;
   --surface: #ffffff;
-  --ink: #1a2332;
-  --muted: #5c6b7a;
-  --line: #d8dee6;
-  --accent: #0f766e;
-  --accent-hover: #0d5f59;
-  --accent-soft: #e6f4f2;
-  --danger: #b42318;
-  --danger-soft: #fef3f2;
-  --warning: #b54708;
-  --warning-soft: #fffaeb;
-  --success: #067647;
-  --success-soft: #ecfdf3;
+  --ink: #1e293b;
+  --muted: #5a6675;
+  --line: #cbd5e1;
+  --accent: #5e191a;
+  --accent-hover: #7e2224;
+  --accent-soft: #efe8e8;
+  /* Secondary brand color (Powder Blue). Non-text use only — white-on-secondary is 1.94:1
+     and fails AA, so it's for icons/borders/soft fills, never a solid button with text. */
+  --secondary: #6c9bbb;
+  --secondary-soft: #e7eff4;
+  --danger: #b91c1c;
+  --danger-soft: #f7e4e4;
+  --warning: #9a5b0a;
+  --warning-soft: #f3ebe2;
+  --success: #0f7a3d;
+  --success-soft: #e2efe8;
   /* DESIGN_SYSTEM §1.2 — separates "on leave" from --accent so links/primary actions
-     stay the only thing that reads as interactive. Verified 5.99:1 / 5.43:1 on soft. */
-  --info: #175cd3;
-  --info-soft: #eff4ff;
-  --nav: #142033;
-  --nav-text: #e8eef5;
-  --nav-muted: #9aabbd;
-  --shadow: 0 1px 2px rgba(20, 32, 51, 0.06);
-  --shadow-md: 0 8px 16px rgba(20, 32, 51, 0.1), 0 2px 4px rgba(20, 32, 51, 0.06);
-  --shadow-lg: 0 20px 32px rgba(20, 32, 51, 0.16), 0 4px 8px rgba(20, 32, 51, 0.08);
-  /* DESIGN_SYSTEM §1.2 — control boundaries need 3:1 contrast; --line (1.35:1) is for
-     decorative dividers only. Verified 3.48:1 on white, 3.19:1 on canvas. */
+     stay the only thing that reads as interactive. Verified 5.17:1 / 4.65:1 on soft. */
+  --info: #2563eb;
+  --info-soft: #eef3fd;
+  --nav: #3a0c0d;
+  --nav-text: #f3e8e8;
+  --nav-muted: #d9b8b9;
+  --shadow: 0 1px 2px rgba(94, 25, 26, 0.06);
+  --shadow-md: 0 8px 16px rgba(94, 25, 26, 0.1), 0 2px 4px rgba(94, 25, 26, 0.06);
+  --shadow-lg: 0 20px 32px rgba(94, 25, 26, 0.16), 0 4px 8px rgba(94, 25, 26, 0.08);
+  /* DESIGN_SYSTEM §1.2 — control boundaries need 3:1 contrast; --line (1.48:1) is for
+     decorative dividers only. Verified 3.48:1 on white, 3.19:1 on canvas — unchanged, this
+     neutral doesn't need to carry the brand hue. */
   --border-control: #7d8b9a;
   font-family: 'IBM Plex Sans', system-ui, sans-serif;
   color: var(--ink);
@@ -62,8 +72,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(15, 118, 110, 0.06), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(20, 32, 51, 0.04), transparent 50%),
+    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(94, 25, 26, 0.05), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(108, 155, 187, 0.08), transparent 50%),
     var(--bg);
 }
 

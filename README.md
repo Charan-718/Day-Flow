@@ -73,6 +73,13 @@ with either the **email** or the **Login ID**.
 | HR Admin (bootstrap) | `hr.admin@dayflow.local` | `ChangeMeOnFirstLogin!` | Forced password change on first login |
 | Demo employees | *(see table below)* | `Password@123` | Same password for all seeded employees |
 
+> **Bootstrap only ever runs once per database** — if you're pointing at a
+> database that was already seeded (e.g. with different `BOOTSTRAP_HR_*`
+> values), the account above won't exist. Any Human Resources department
+> employee from the table below also has `HR_ADMIN` access, or check which
+> account actually exists:
+> `docker exec dayflow-db psql -U dayflow -d dayflow -c "SELECT email FROM \"User\" WHERE role='HR_ADMIN' ORDER BY \"createdAt\" LIMIT 1;"`
+
 ### Local dev (`npm run prisma:seed` with the values in `backend/.env.example`)
 
 | Role | Email | Password | Notes |
@@ -82,19 +89,21 @@ with either the **email** or the **Login ID**.
 
 The demo-employee email domain and password are hardcoded the same way in
 both Docker and local dev (only the bootstrap HR admin's credentials
-differ), so the table below applies to either setup. One employee per
-department, so you can sign in as any role/level:
+differ), so the table below applies to either setup. Name-to-role
+assignment is deterministic (hashed from department + designation), so
+these stay the same across every reseed — one employee per department, so
+you can sign in as any role/level:
 
 | Department | Name | Email | Designation |
 |---|---|---|---|
-| Engineering | Deepak Nair | `deepak.nair@dayflow-demo.local` | Engineering Manager |
-| Human Resources | Ananya Krishnan | `hr.admin@…` (bootstrap account) | HR Officer |
-| Sales | Ritu Gupta | `ritu.gupta@dayflow-demo.local` | Sales Manager |
-| Marketing | Ananya Pillai | `ananya.pillai@dayflow-demo.local` | Digital Marketing Manager |
-| Finance | Suresh Pillai | `suresh.pillai@dayflow-demo.local` | Finance Manager |
-| Customer Success | Sneha Singh | `sneha.singh@dayflow-demo.local` | Customer Success Manager |
-| Design | Neha Kumar | `neha.kumar@dayflow-demo.local` | Design Lead |
-| Operations | Vikram Patel | `vikram.patel@dayflow-demo.local` | Operations Manager |
+| Engineering | Deepika Iyer | `deepika.iyer@dayflow-demo.local` | Engineering Manager |
+| Human Resources | Anjali Patel | `anjali.patel@dayflow-demo.local` | HR Manager |
+| Sales | Radhika Patel | `radhika.patel@dayflow-demo.local` | Sales Manager |
+| Marketing | Isha Gupta | `isha.gupta@dayflow-demo.local` | Digital Marketing Manager |
+| Finance | Radhika Gupta | `radhika.gupta@dayflow-demo.local` | Finance Manager |
+| Customer Success | Anjali Gupta | `anjali.gupta@dayflow-demo.local` | Customer Success Manager |
+| Design | Kunal Bhat | `kunal.bhat@dayflow-demo.local` | Design Lead |
+| Operations | Pooja Bose | `pooja.bose@dayflow-demo.local` | Operations Manager |
 
 Every employee in the **Human Resources** department signs in with
 `HR_ADMIN` access (full directory, approvals, salary, audit log); everyone
@@ -158,3 +167,7 @@ seeding creates a believable demo company, not just a couple of test rows:
 - Employee 360 profile: Info / Resume / Private Info / About / Security tabs
 - Salary tab (HR-visible), audit log, workforce health dashboard (HR only)
 - Forced password change on first login for HR-bootstrapped accounts
+- HR-mediated password reset (no email service is configured, so there's no
+  self-service "forgot password" — the login page explains this, and an HR
+  Admin can generate a fresh temporary password from any employee's profile
+  Security tab and relay it directly)

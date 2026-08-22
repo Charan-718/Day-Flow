@@ -25,6 +25,20 @@ export async function createEmployee(req: Request, res: Response, next: NextFunc
   }
 }
 
+export async function resetEmployeePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await authService.resetEmployeePassword(
+      req.params.id,
+      req.user!.userId,
+      req.user!.role,
+      req.clientIp
+    );
+    return sendSuccess(res, data, 'Password reset');
+  } catch (err) {
+    return next(err);
+  }
+}
+
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {
   try {
     const data = await authService.verifyEmail(req.body);
