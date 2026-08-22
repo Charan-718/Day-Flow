@@ -55,10 +55,12 @@ export function Drawer({
         {title && (
           <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
             <div className="min-w-0">
-              <h2 id="drawer-title" className="text-base font-semibold text-[var(--ink)]">
+              <h2 id="drawer-title" className="break-words text-base font-semibold text-[var(--ink)]">
                 {title}
               </h2>
-              {subtitle && <p className="mt-0.5 text-sm text-[var(--muted)]">{subtitle}</p>}
+              {subtitle && (
+                <p className="mt-0.5 break-words text-sm text-[var(--muted)]">{subtitle}</p>
+              )}
             </div>
             <button
               type="button"

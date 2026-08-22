@@ -64,7 +64,7 @@ export function ConfirmDialog({
             <h2 id="confirm-title" className="text-base font-semibold text-[var(--ink)]">
               {title}
             </h2>
-            <p id="confirm-desc" className="mt-1 text-sm text-[var(--muted)]">
+            <p id="confirm-desc" className="mt-1 break-words text-sm text-[var(--muted)]">
               {description}
             </p>
           </div>

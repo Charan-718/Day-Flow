@@ -205,7 +205,9 @@ export function TimeOffPage() {
             <button
               key={tab.key}
               type="button"
-              aria-pressed={isActive}
+              // aria-current, not aria-pressed — these are mutually exclusive filter
+              // options (one "current" selection), not independent toggle buttons.
+              aria-current={isActive ? 'true' : undefined}
               onClick={() => setStatusFilter(tab.key)}
               className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
                 isActive
@@ -286,7 +288,15 @@ export function TimeOffPage() {
                       <StatusBadge status={r.status} />
                     </td>
                     <td className="px-3 py-2.5 text-right">
-                      <Button type="button" size="sm" variant="secondary" onClick={() => setReviewingId(r.id)}>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setReviewingId(r.id)}
+                        aria-label={`${isAdmin && r.status === 'PENDING' ? 'Review' : 'View'} ${r.leaveType.name} request${
+                          isAdmin && r.employee ? ` for ${r.employee.firstName} ${r.employee.lastName}` : ''
+                        }, ${formatDate(r.startDate)} to ${formatDate(r.endDate)}`}
+                      >
                         {isAdmin && r.status === 'PENDING' ? 'Review' : 'View'}
                       </Button>
                     </td>
@@ -364,7 +374,7 @@ export function TimeOffPage() {
             </select>
           </label>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="block text-sm">
               <span className="mb-1.5 block font-medium text-[var(--ink)]">Start date</span>
               <input
@@ -443,7 +453,10 @@ export function TimeOffPage() {
           </label>
 
           {create.isError && (
-            <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+            <p
+              role="alert"
+              className="break-words rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]"
+            >
               {getApiError(create.error).message}
             </p>
           )}

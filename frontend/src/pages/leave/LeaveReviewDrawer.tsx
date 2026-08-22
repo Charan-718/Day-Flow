@@ -124,13 +124,19 @@ export function LeaveReviewDrawer({
           canAct ? (
             <div className="space-y-3">
               {mutationErr != null && (
-                <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+                <p
+                  role="alert"
+                  className="break-words rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]"
+                >
                   {getApiError(mutationErr).message}
                 </p>
               )}
               <label className="block text-sm">
                 <span className="mb-1 block font-medium text-[var(--ink)]">
-                  Comment <span className="font-normal text-[var(--muted)]">(required to reject)</span>
+                  Comment{' '}
+                  <span id="reject-comment-hint" className="font-normal text-[var(--muted)]">
+                    (required to reject)
+                  </span>
                 </span>
                 <textarea
                   rows={2}
@@ -146,6 +152,7 @@ export function LeaveReviewDrawer({
                   type="button"
                   variant="danger"
                   disabled={!trimmedComment || isPending}
+                  aria-describedby={!trimmedComment ? 'reject-comment-hint' : undefined}
                   onClick={() => setConfirmingReject(true)}
                 >
                   Reject
@@ -186,7 +193,7 @@ export function LeaveReviewDrawer({
             {request.remarks && (
               <div>
                 <p className="text-xs font-medium text-[var(--muted)]">Remarks</p>
-                <p className="mt-1 text-sm text-[var(--ink)]">{request.remarks}</p>
+                <p className="mt-1 break-words text-sm text-[var(--ink)]">{request.remarks}</p>
               </div>
             )}
 
@@ -207,14 +214,14 @@ export function LeaveReviewDrawer({
                 <p className="text-xs font-medium text-[var(--muted)]">
                   Review comment · {request.reviewedAt ? formatDateTime(request.reviewedAt) : ''}
                 </p>
-                <p className="mt-1 text-sm text-[var(--ink)]">{request.reviewComment}</p>
+                <p className="mt-1 break-words text-sm text-[var(--ink)]">{request.reviewComment}</p>
               </div>
             )}
 
             <div>
-              <p className="mb-3 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+              <h3 className="mb-3 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
                 Workflow
-              </p>
+              </h3>
               <WorkflowTrail request={request} />
             </div>
 
