@@ -243,7 +243,12 @@ async function main() {
   console.log('Seed complete.');
 }
 
-main()
+// `npm run db:reset` passes --reset to force-clear and reseed attendance, leave,
+// notifications and the audit log even when they already contain data. A routine
+// `npm run prisma:seed` (also what runs on every container boot) never does this.
+const forceReset = process.argv.includes('--reset');
+
+main(forceReset)
   .catch((e) => {
     console.error(e);
     process.exit(1);

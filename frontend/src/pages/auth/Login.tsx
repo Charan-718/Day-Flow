@@ -42,11 +42,11 @@ export function LoginPage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <label className="block text-sm">
           <span className="mb-1 block font-medium">Login ID / Email</span>
           <input
-            className="w-full rounded-md border border-[var(--line)] px-3 py-2 outline-none focus:border-[var(--accent)]"
+            className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="username"
@@ -54,10 +54,10 @@ export function LoginPage() {
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium">Password</span>
+          <span className="mb-1.5 block font-medium text-[var(--ink)]">Password</span>
           <input
             type="password"
-            className="w-full rounded-md border border-[var(--line)] px-3 py-2 outline-none focus:border-[var(--accent)]"
+            className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
@@ -65,7 +65,7 @@ export function LoginPage() {
           />
         </label>
         {error && (
-          <p className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+          <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
             {error}
           </p>
         )}

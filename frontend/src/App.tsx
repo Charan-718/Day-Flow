@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
+import { ToastProvider } from './components/Toast';
 import { AppShell, AuthLayout } from './layouts/AppShell';
 import { RequireAuth, RequireRole, RoleLanding } from './routes/guards';
 import { LoginPage } from './pages/auth/Login';
@@ -30,27 +31,28 @@ export default function App() {
               <Route path="/change-password" element={<ChangePasswordPage />} />
             </Route>
 
-            <Route element={<RequireAuth />}>
-              <Route element={<AppShell />}>
-                <Route path="/" element={<RoleLanding />} />
-                <Route path="/profile" element={<EmployeeProfile self />} />
-                <Route path="/attendance" element={<AttendancePage />} />
-                <Route path="/time-off" element={<TimeOffPage />} />
+              <Route element={<RequireAuth />}>
+                <Route element={<AppShell />}>
+                  <Route path="/" element={<RoleLanding />} />
+                  <Route path="/profile" element={<EmployeeProfile self />} />
+                  <Route path="/attendance" element={<AttendancePage />} />
+                  <Route path="/time-off" element={<TimeOffPage />} />
 
-                <Route element={<RequireRole role="HR_ADMIN" />}>
-                  <Route path="/employees" element={<EmployeeDirectory />} />
-                  <Route path="/employees/:id" element={<EmployeeProfile />} />
-                  <Route path="/employees/:id/360" element={<Employee360Page />} />
-                  <Route path="/audit" element={<AuditLogPage />} />
-                  <Route path="/health" element={<WorkforceHealthPage />} />
+                  <Route element={<RequireRole role="HR_ADMIN" />}>
+                    <Route path="/employees" element={<EmployeeDirectory />} />
+                    <Route path="/employees/:id" element={<EmployeeProfile />} />
+                    <Route path="/employees/:id/360" element={<Employee360Page />} />
+                    <Route path="/audit" element={<AuditLogPage />} />
+                    <Route path="/health" element={<WorkforceHealthPage />} />
+                  </Route>
                 </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

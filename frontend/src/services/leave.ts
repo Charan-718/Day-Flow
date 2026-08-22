@@ -25,10 +25,15 @@ export async function getLeaveBalance() {
 
 export async function listLeaveRequests(params?: {
   status?: string;
+  employeeId?: string;
   page?: number;
+  pageSize?: number;
 }) {
   const { data } = await api.get<
-    ApiSuccess<{ items: LeaveRequest[]; pagination: { total: number } }>
+    ApiSuccess<{
+      items: LeaveRequest[];
+      pagination: { page: number; pageSize: number; total: number; totalPages: number };
+    }>
   >('/leave/requests', { params });
   return data.data;
 }
