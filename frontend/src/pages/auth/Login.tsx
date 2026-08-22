@@ -46,10 +46,8 @@ export function LoginPage() {
     <div className="landing-vibrant-card relative flex min-h-[90vh] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-12 lg:p-16 shadow-2xl">
       {/* Top Header */}
       <div className="text-center pt-2">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-night-bordeaux)] text-white shadow-[var(--glow-primary)] border border-[var(--color-night-bordeaux)]">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-white)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-          </svg>
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-night-bordeaux)] text-white shadow-[var(--glow-primary)] border border-[var(--color-night-bordeaux)] overflow-hidden">
+          <img src="/dayflow-logo.svg" alt="DayFlow Logo" className="h-full w-full object-cover" />
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--color-heading)] mb-3">
           {asHr ? 'Admin / HR sign in' : 'Employee sign in'}

@@ -39,22 +39,7 @@ export default function Navbar() {
       >
         {/* BRAND LOGO */}
         <a href="#hero" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--color-night-bordeaux)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: 'var(--glow-primary)',
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-white)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
-          </div>
+          <img src="/dayflow-logo.svg" alt="DayFlow Logo" style={{ width: '42px', height: '42px', borderRadius: 'var(--radius-sm)' }} />
           <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-night-bordeaux)', letterSpacing: '-0.02em' }}>
             Day<span style={{ color: 'var(--color-secondary)' }}>Flow</span>
           </span>

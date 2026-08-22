@@ -44,11 +44,10 @@ export default function Footer() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                overflow: 'hidden',
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-white)" strokeWidth="2.5">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
+              <img src="/dayflow-logo.svg" alt="DayFlow Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: 800, color: 'var(--color-night-bordeaux)' }}>
               Dayflow HRMS
