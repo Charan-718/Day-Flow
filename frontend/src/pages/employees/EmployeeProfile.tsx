@@ -188,11 +188,11 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
   return (
     <div>
       {/* Profile header — identity first, then the facts people look up most often. */}
-      <section className="mb-5 overflow-hidden rounded-lg border border-[var(--line)] bg-white shadow-[var(--shadow)]">
-        <div className="h-16 bg-[var(--nav)] sm:h-20" aria-hidden="true" />
-        <div className="px-5 pb-5">
-          <div className="-mt-10 flex flex-col gap-4 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-end">
+      <section className="mb-8 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl">
+        <div className="h-24 bg-gradient-to-r from-[var(--color-background-deep)] to-[var(--color-surface)]" aria-hidden="true" />
+        <div className="px-6 pb-6 sm:px-8 sm:pb-8">
+          <div className="-mt-12 flex flex-col gap-6 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-end">
               <AvatarUpload
                 employeeId={employeeId}
                 currentUrl={emp.profilePictureUrl as string | null}
@@ -202,21 +202,21 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
                 size={96}
               />
               <div className="pb-1 text-center sm:pb-2 sm:text-left">
-                <h1 className="text-xl font-semibold tracking-tight text-[var(--ink)]">
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-powder-blue)]">
                   {String(emp.firstName || '')} {String(emp.lastName || '')}
                 </h1>
-                <p className="mt-0.5 text-sm text-[var(--muted)]">
-                  {String(emp.designation || '—')} · <span className="font-mono">{String(emp.employeeCode || '')}</span>
+                <p className="mt-1 text-sm font-medium text-[var(--color-text-secondary)]">
+                  {String(emp.designation || '—')} · <span className="font-mono text-[var(--color-powder-blue)]">{String(emp.employeeCode || '')}</span>
                 </p>
                 {emp.accountStatus ? (
-                  <span className="mt-2 inline-flex">
+                  <span className="mt-2.5 inline-flex">
                     <StatusBadge status={String(emp.accountStatus)} />
                   </span>
                 ) : null}
               </div>
             </div>
 
-            <div className="flex shrink-0 justify-center gap-2 sm:justify-end sm:pb-2">
+            <div className="flex shrink-0 justify-center gap-3 sm:justify-end sm:pb-2">
               {isAdmin && !self && (
                 <Link to={`/employees/${employeeId}/360`}>
                   <Button variant="secondary">360° View</Button>
@@ -232,7 +232,7 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
         </div>
       </section>
 
-      <div role="tablist" aria-label="Profile sections" className="mb-4 flex gap-1 border-b border-[var(--line)]">
+      <div role="tablist" aria-label="Profile sections" className="mb-6 flex flex-wrap gap-3 border-b border-[var(--color-border)] pb-2 px-1">
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -244,10 +244,10 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
             tabIndex={tab === t.key ? 0 : -1}
             onClick={() => setTab(t.key)}
             onKeyDown={(e) => handleTabKeyDown(e, t.key)}
-            className={`px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
+            className={`px-6 py-2.5 text-sm font-bold transition-all rounded-t-xl cursor-pointer ${
               tab === t.key
-                ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]'
-                : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                ? 'border-b-2 border-[var(--color-powder-blue)] text-[var(--color-powder-blue)] bg-[var(--color-surface)] shadow-md'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-background-deep)]'
             }`}
           >
             {t.label}
@@ -259,10 +259,10 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
         role="tabpanel"
         id={`profile-panel-${tab}`}
         aria-labelledby={`profile-tab-${tab}`}
-        className="rounded-lg border border-[var(--line)] bg-white p-5 shadow-[var(--shadow)]"
+        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8 lg:p-10 shadow-xl"
       >
         {tab === 'info' && (
-          <dl className="grid gap-4 sm:grid-cols-2">
+          <dl className="grid gap-6 sm:grid-cols-2 lg:gap-x-16 lg:gap-y-8">
             <Field label="Company" value={String(emp.companyName || 'Dayflow')} />
             <Field label="Login ID" value={String(emp.loginId || '')} mono />
             <Field label="Email" value={String(emp.email || '')} />
@@ -370,7 +370,7 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
         )}
 
         {tab === 'private' && (
-          <dl className="grid gap-4 sm:grid-cols-2">
+          <dl className="grid gap-6 sm:grid-cols-2 lg:gap-x-16 lg:gap-y-8">
             <Field
               label="Date of Birth"
               value={
@@ -614,8 +614,8 @@ function Field({
 }) {
   return (
     <div>
-      <dt className="text-xs font-medium text-[var(--muted)]">{label}</dt>
-      <dd className={`mt-1 text-sm text-[var(--ink)] ${mono ? 'font-mono' : ''}`}>{children || value}</dd>
+      <dt className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">{label}</dt>
+      <dd className={`mt-1.5 text-base font-semibold text-[var(--color-text)] ${mono ? 'font-mono text-[var(--color-powder-blue)]' : ''}`}>{children || value}</dd>
     </div>
   );
 }

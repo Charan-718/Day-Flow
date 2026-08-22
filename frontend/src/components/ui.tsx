@@ -13,14 +13,14 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-[var(--line)] bg-white px-6 py-12 text-center">
+    <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-12 text-center shadow-lg">
       {icon && (
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg)] text-[var(--muted)]">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-background-deep)] text-[var(--color-powder-blue)]">
           {icon}
         </div>
       )}
-      <p className="text-sm font-medium text-[var(--ink)]">{title}</p>
-      {hint && <p className="mt-1 text-sm text-[var(--muted)]">{hint}</p>}
+      <p className="text-sm font-semibold text-[var(--color-text)]">{title}</p>
+      {hint && <p className="mt-1 text-sm text-[var(--color-text-muted)]">{hint}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -48,13 +48,13 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="rounded-lg border border-[var(--danger)]/30 bg-[var(--danger-soft)] px-4 py-6 text-center">
-      <p className="text-sm text-[var(--danger)]">{message}</p>
+    <div className="rounded-xl border border-[var(--color-bordeaux-main)]/40 bg-[var(--color-bordeaux-alpha-15)] px-4 py-6 text-center">
+      <p className="text-sm font-medium text-[#ff7b79]">{message}</p>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 inline-flex h-8 cursor-pointer items-center rounded-md px-3 text-sm font-medium text-[var(--accent)] underline underline-offset-2 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+          className="mt-3 inline-flex h-8 cursor-pointer items-center rounded-md px-3 text-sm font-semibold text-[var(--color-powder-blue)] underline underline-offset-2 hover:text-white focus-visible:outline-none"
         >
           Retry
         </button>
@@ -73,10 +73,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-[var(--color-border)]/60 pb-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-[var(--ink)]">{title}</h1>
-        {subtitle && <p className="mt-0.5 text-sm text-[var(--muted)]">{subtitle}</p>}
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-heading)]">{title}</h1>
+        {subtitle && <p className="mt-1 text-sm font-medium text-[var(--color-text-muted)]">{subtitle}</p>}
       </div>
       {actions}
     </div>
@@ -89,16 +89,16 @@ export function StatStrip({
   items: Array<{ label: string; value: string | number }>;
 }) {
   return (
-    <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fit,minmax(160px,1fr))]">
+    <div className="mb-6 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
         <div
           key={item.label}
-          className="rounded-lg border border-[var(--line)] bg-white px-4 py-3 shadow-[var(--shadow)]"
+          className="flex flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl transition hover:border-[var(--color-powder-blue)]/50"
         >
-          <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
             {item.label}
           </p>
-          <p className="mt-1 text-2xl font-semibold tabular-nums text-[var(--ink)]">
+          <p className="mt-2 text-3xl font-black tabular-nums text-[var(--color-powder-blue)]">
             {item.value}
           </p>
         </div>

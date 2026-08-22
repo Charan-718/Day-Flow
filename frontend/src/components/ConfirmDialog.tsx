@@ -48,7 +48,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby="confirm-desc"
-        className="relative w-full max-w-sm rounded-xl border border-[var(--line)] bg-white p-5 shadow-2xl outline-none"
+        className="relative w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-[var(--color-text)] shadow-2xl outline-none"
       >
         <div className="flex items-start gap-3">
           <span

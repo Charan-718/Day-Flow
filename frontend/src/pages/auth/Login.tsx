@@ -3,7 +3,6 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getRegistrationStatus } from '../../services/auth';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/Button';
 import { getApiError } from '../../api/client';
 
 export function LoginPage() {
@@ -44,97 +43,119 @@ export function LoginPage() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--line)] bg-white p-8 shadow-[var(--shadow)]">
-      <div className="mb-6 text-center">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--accent)] text-lg font-bold text-white">
-          Df
+    <div className="landing-vibrant-card relative flex min-h-[90vh] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-12 lg:p-16 shadow-2xl">
+      {/* Top Header */}
+      <div className="text-center pt-2">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-night-bordeaux)] text-white shadow-[var(--glow-primary)] border border-[var(--color-night-bordeaux)]">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-white)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--color-heading)] mb-3">
           {asHr ? 'Admin / HR sign in' : 'Employee sign in'}
         </h1>
-        <p className="mt-1 text-sm text-[var(--muted)]">
+        <p className="text-base sm:text-lg font-medium text-[var(--color-text-muted)] max-w-xl mx-auto">
           {asHr
             ? 'Manage your organisation, people and approvals'
             : 'Use the Login ID or email provided by HR'}
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Login ID / Email</span>
+      {/* Form Credentials Container */}
+      <form onSubmit={onSubmit} className="my-auto mx-auto w-full max-w-2xl space-y-7 py-6" noValidate>
+        <div>
+          <label className="mb-2.5 block text-base font-semibold text-[var(--color-text-secondary)]">
+            Login ID / Email
+          </label>
           <input
-            className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-6 py-4 text-lg text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="username"
+            placeholder="e.g. alex@company.com or HR-1002"
             required
           />
-        </label>
-        <label className="block text-sm">
-          <div className="mb-1.5 flex items-baseline justify-between">
-            <span className="font-medium text-[var(--ink)]">Password</span>
+        </div>
+
+        <div>
+          <div className="mb-2.5 flex items-center justify-between">
+            <label className="text-base font-semibold text-[var(--color-text-secondary)]">
+              Password
+            </label>
             <button
               type="button"
               onClick={() => setShowForgot((v) => !v)}
-              className="rounded text-xs font-medium text-[var(--accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="text-sm font-semibold text-[var(--color-powder-blue)] hover:text-white transition-colors focus:outline-none"
             >
               Forgot password?
             </button>
           </div>
           <input
             type="password"
-            className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+            className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-6 py-4 text-lg text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            placeholder="••••••••••••"
             required
           />
-        </label>
+        </div>
+
         {showForgot && (
-          <p className="rounded-md bg-[var(--info-soft)] px-3 py-2 text-sm text-[var(--info)]">
-            There's no self-service reset. Ask your HR administrator to generate a new
-            temporary password from your profile's Security tab.
-          </p>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-deep)] p-5 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+            <span className="font-semibold text-[var(--color-powder-blue)] block mb-1">Reset Password Info</span>
+            There&apos;s no self-service reset. Ask your HR administrator to generate a new
+            temporary password from your profile&apos;s Security tab.
+          </div>
         )}
+
         {error && (
-          <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
+          <div role="alert" className="rounded-2xl border border-[var(--color-bordeaux-main)]/40 bg-[var(--color-bordeaux-alpha-15)] p-4 text-base font-medium text-[#ff7b79]">
             {error}
-          </p>
+          </div>
         )}
-        <Button type="submit" className="w-full" disabled={loading}>
+
+        <button
+          type="submit"
+          className="landing-btn-primary w-full justify-center py-4 text-lg font-extrabold shadow-lg rounded-2xl cursor-pointer"
+          disabled={loading}
+        >
           {loading ? 'Signing in…' : 'SIGN IN'}
-        </Button>
+        </button>
       </form>
 
-      {asHr && registration.data?.open ? (
-        <p className="mt-6 text-center text-sm text-[var(--muted)]">
-          Setting up a new organisation?{' '}
+      {/* Footer info & Navigation */}
+      <div className="pb-2 text-center">
+        {asHr && registration.data?.open ? (
+          <p className="text-base text-[var(--color-text-muted)] mb-3">
+            Setting up a new organisation?{' '}
+            <Link
+              to="/signup"
+              className="font-bold text-[var(--color-powder-blue)] hover:underline transition-colors"
+            >
+              Create your company
+            </Link>
+          </p>
+        ) : asHr ? (
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
+            An organisation is already set up for this workspace — sign in with your HR account
+            above.
+          </p>
+        ) : (
+          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed mb-3">
+            Employee accounts are provisioned by HR — there is no public sign-up.
+          </p>
+        )}
+
+        <p className="text-base">
           <Link
-            to="/signup"
-            className="rounded font-medium text-[var(--accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            to="/"
+            className="inline-flex items-center gap-1.5 font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-powder-blue)] transition-colors"
           >
-            Create your company
+            ← Back to home
           </Link>
         </p>
-      ) : asHr ? (
-        <p className="mt-6 text-center text-xs text-[var(--muted)]">
-          An organisation is already set up for this workspace — sign in with your HR account
-          above.
-        </p>
-      ) : (
-        <p className="mt-6 text-center text-xs text-[var(--muted)]">
-          Employee accounts are provisioned by HR — there is no public sign-up.
-        </p>
-      )}
-
-      <p className="mt-4 text-center text-sm">
-        <Link
-          to="/"
-          className="rounded text-[var(--muted)] hover:text-[var(--ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-        >
-          ← Back to home
-        </Link>
-      </p>
+      </div>
     </div>
   );
 }

@@ -10,9 +10,9 @@ import { CloseIcon, UserPlusIcon } from '../../components/icons';
 import { getApiError } from '../../api/client';
 
 const inputClass =
-  'w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2';
+  'w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-3 text-base text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30';
 const errorInputClass =
-  'w-full rounded-md border border-[var(--danger)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--danger)] focus-visible:ring-offset-2';
+  'w-full rounded-xl border border-[var(--color-bordeaux-main)] bg-[var(--color-background-deep)] px-4 py-3 text-base text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-bordeaux-main)] focus:ring-2 focus:ring-[var(--color-bordeaux-main)]/30';
 
 interface FormState {
   companyName: string;
@@ -66,12 +66,12 @@ function Field({
 }) {
   return (
     <label className="block text-sm">
-      <span className="mb-1.5 block font-medium text-[var(--ink)]">
-        {label} {hint && <span className="font-normal text-[var(--muted)]">{hint}</span>}
+      <span className="mb-2 block font-semibold text-[var(--color-text-secondary)]">
+        {label} {hint && <span className="font-normal text-[var(--color-text-muted)]">{hint}</span>}
       </span>
       {children}
       {error && (
-        <span role="alert" className="mt-1 block text-xs text-[var(--danger)]">
+        <span role="alert" className="mt-1.5 block text-xs font-semibold text-[#ff7b79]">
           {error}
         </span>
       )}
@@ -145,9 +145,9 @@ export function SignUpPage() {
 
   if (status.isLoading) {
     return (
-      <div className="rounded-xl border border-[var(--line)] bg-white p-8 shadow-[var(--shadow)]">
-        <div className="mx-auto h-10 w-10 animate-pulse rounded-lg bg-[var(--line)]/60" />
-        <div className="mx-auto mt-4 h-4 w-40 animate-pulse rounded bg-[var(--line)]/60" />
+      <div className="landing-vibrant-card rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 text-center shadow-2xl">
+        <div className="mx-auto h-10 w-10 animate-pulse rounded-lg bg-[var(--color-border)]" />
+        <div className="mx-auto mt-4 h-4 w-40 animate-pulse rounded bg-[var(--color-border)]" />
       </div>
     );
   }
@@ -155,18 +155,18 @@ export function SignUpPage() {
   // Employees can never self-register: once an organisation exists this screen closes.
   if (status.data && !status.data.open) {
     return (
-      <div className="rounded-xl border border-[var(--line)] bg-white p-8 text-center shadow-[var(--shadow)]">
-        <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--info-soft)] text-[var(--info)]">
-          <UserPlusIcon size={20} />
+      <div className="landing-vibrant-card rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-10 text-center shadow-2xl">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-cyan-alpha-12)] text-[var(--color-powder-blue)]">
+          <UserPlusIcon size={24} />
         </div>
-        <h1 className="text-lg font-semibold text-[var(--ink)]">Sign-up is closed</h1>
-        <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--muted)]">
+        <h1 className="text-xl font-bold text-[var(--color-heading)]">Sign-up is closed</h1>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--color-text-muted)] leading-relaxed">
           This workspace already has an organisation. Employee accounts are created by your HR
           Admin, who will share your Login ID and a temporary password.
         </p>
         <Link
           to="/login"
-          className="mt-5 inline-flex h-10 items-center rounded-md bg-[var(--accent)] px-4 text-sm font-medium text-white hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+          className="landing-btn-primary mt-6 inline-flex justify-center px-6 py-2.5 text-sm font-bold shadow-[var(--shadow-md)]"
         >
           Go to sign in
         </Link>
@@ -175,12 +175,12 @@ export function SignUpPage() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--line)] bg-white p-6 shadow-[var(--shadow)] sm:p-8">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-[var(--ink)]">
+    <div className="landing-vibrant-card relative flex min-h-[90vh] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-12 shadow-2xl">
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-heading)] mb-2">
           Create your organisation
         </h1>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-[var(--muted)]">
+        <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-[var(--color-text-muted)]">
           Sets up your company and your HR Admin account. You'll add employees from inside
           Dayflow — they don't sign up themselves.
         </p>
@@ -331,24 +331,24 @@ export function SignUpPage() {
         </fieldset>
 
         {serverError && (
-          <p
+          <div
             role="alert"
-            className="break-words rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]"
+            className="break-words rounded-xl border border-[var(--color-bordeaux-main)]/40 bg-[var(--color-bordeaux-alpha-15)] p-4 text-sm font-medium text-[#ff7b79]"
           >
             {serverError}
-          </p>
+          </div>
         )}
 
-        <Button type="submit" size="lg" className="w-full" loading={busy}>
-          Create organisation
-        </Button>
+        <button type="submit" className="landing-btn-primary w-full justify-center py-3.5 text-base font-bold shadow-[var(--shadow-md)] cursor-pointer" disabled={busy}>
+          {busy ? 'Creating organisation…' : 'Create organisation'}
+        </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[var(--muted)]">
+      <p className="mt-8 text-center text-sm text-[var(--color-text-muted)]">
         Already have an account?{' '}
         <Link
           to="/login"
-          className="rounded font-medium text-[var(--accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="font-bold text-[var(--color-powder-blue)] hover:underline transition-colors"
         >
           Sign in
         </Link>

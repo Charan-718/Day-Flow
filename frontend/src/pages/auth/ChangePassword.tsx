@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { changePassword } from '../../services/auth';
 import { useAuth } from '../../hooks/useAuth';
-import { Button } from '../../components/Button';
 import { getApiError } from '../../api/client';
 
 export function ChangePasswordPage() {
@@ -34,50 +33,54 @@ export function ChangePasswordPage() {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--line)] bg-white p-8 shadow-[var(--shadow)]">
-      <h1 className="text-xl font-semibold">Change password</h1>
-      <p className="mt-1 text-sm text-[var(--muted)]">
+    <div className="landing-vibrant-card relative flex min-h-[90vh] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-12 shadow-2xl">
+      <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--color-heading)] mb-2">Change password</h1>
+      <p className="text-sm font-medium text-[var(--color-text-muted)]">
         You must set a new password before continuing.
       </p>
-      <form onSubmit={onSubmit} className="mt-6 space-y-4">
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Current password</span>
+      <form onSubmit={onSubmit} className="mt-6 space-y-5">
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-[var(--color-text-secondary)]">Current password</label>
           <input
             type="password"
             required
-            className="w-full rounded-md border border-[var(--line)] px-3 py-2"
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-3 text-base text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">New password</span>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-[var(--color-text-secondary)]">New password</label>
           <input
             type="password"
             required
             minLength={12}
-            className="w-full rounded-md border border-[var(--line)] px-3 py-2"
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-3 text-base text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
-          <span className="mt-1 block text-xs text-[var(--muted)]">
+          <span className="mt-1.5 block text-xs text-[var(--color-text-muted)]">
             Min 12 chars, upper + lower + number
           </span>
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block font-medium">Confirm new password</span>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-[var(--color-text-secondary)]">Confirm new password</label>
           <input
             type="password"
             required
-            className="w-full rounded-md border border-[var(--line)] px-3 py-2"
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-3 text-base text-[var(--color-text)] placeholder-[var(--color-text-muted)] outline-none transition duration-200 focus:border-[var(--color-powder-blue)] focus:ring-2 focus:ring-[var(--color-powder-blue)]/30"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
-        </label>
-        {error && <p className="text-sm text-[var(--danger)]">{error}</p>}
-        <Button type="submit" className="w-full" disabled={mutation.isPending}>
-          Update password
-        </Button>
+        </div>
+        {error && (
+          <div role="alert" className="rounded-xl border border-[var(--color-bordeaux-main)]/40 bg-[var(--color-bordeaux-alpha-15)] p-4 text-sm font-medium text-[#ff7b79]">
+            {error}
+          </div>
+        )}
+        <button type="submit" className="landing-btn-primary w-full justify-center py-3.5 text-base font-bold shadow-[var(--shadow-md)] cursor-pointer" disabled={mutation.isPending}>
+          {mutation.isPending ? 'Updating password…' : 'Update password'}
+        </button>
       </form>
     </div>
   );

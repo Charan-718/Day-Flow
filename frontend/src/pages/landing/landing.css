@@ -28,89 +28,96 @@
      unmounts route-level stylesheets. Custom properties inherit, so descendants still
      resolve var(--color-*) etc. normally. */
   /* USER PALETTE CORE CONSTANTS */
-  --color-night-bordeaux: #5E191A;
-  --color-powder-blue: #9ABFD8;
+  --bg-root: #212121;
+  --background-root: #212121;
+  --bg-primary: #212121;
+  --background: #212121;
+  --color-dark-charcoal: #212121;
+
+  /* Red / Maroon Replacement (#8c3dff Violet) */
+  --color-maroon: #8c3dff;
+  --color-red-vibrant: #8c3dff;
+  --color-night-bordeaux: #8c3dff;
+  --color-bordeaux-main: #8c3dff;
+  --color-bordeaux-hover: #a259ff;
+  --color-bordeaux-deep: #661acb;
+  --color-bordeaux-alpha-08: rgba(140, 61, 255, 0.08);
+  --color-bordeaux-alpha-15: rgba(140, 61, 255, 0.15);
+  --color-bordeaux-alpha-30: rgba(140, 61, 255, 0.3);
+
+  /* Powder Blue Replacement (#b0ff3d Radium) */
+  --color-powder-blue: #b0ff3d;
+  --color-powder-blue-light: rgba(176, 255, 61, 0.12);
+  --color-powder-blue-card: rgba(176, 255, 61, 0.18);
+  --color-powder-blue-dark: #97e624;
   --color-alabaster-grey: #E0E4E8;
 
-  /* Powder Blue Tonal Scale */
-  --color-powder-blue-light: #EBF3F8;
-  --color-powder-blue-card: #E0ECF4;
-  --color-powder-blue-dark: #6C9BBB;
-
-  /* Night Bordeaux Tonal Scale */
-  --color-bordeaux-main: #5E191A;
-  --color-bordeaux-hover: #7E2224;
-  --color-bordeaux-deep: #3A0C0D;
-  --color-bordeaux-alpha-08: rgba(94, 25, 26, 0.08);
-  --color-bordeaux-alpha-15: rgba(94, 25, 26, 0.15);
-  --color-bordeaux-alpha-30: rgba(94, 25, 26, 0.3);
-
-  /* Alabaster & Clean Light Backgrounds */
+  /* Alabaster & Clean Background Tokens */
   --color-alabaster-canvas: #F4F7FA;
   --color-alabaster-alt: #E8EEF4;
   --color-alabaster-card: #FFFFFF;
 
   /* ==========================================================================
-     1. SEMANTIC COLOR TOKENS (LIGHT ALABASTER & POWDER BLUE THEME)
+     1. SEMANTIC COLOR TOKENS
      ========================================================================== */
 
-  /* Primary Action & Brand (Night Bordeaux for High Contrast) */
-  --color-primary: #5E191A;
-  --color-primary-hover: #7E2224;
-  --color-primary-alpha-12: rgba(94, 25, 26, 0.12);
-  --color-primary-alpha-30: rgba(94, 25, 26, 0.3);
+  /* Primary Action & Brand (#8c3dff Violet) */
+  --color-primary: #8c3dff;
+  --color-primary-hover: #a259ff;
+  --color-primary-alpha-12: rgba(140, 61, 255, 0.12);
+  --color-primary-alpha-30: rgba(140, 61, 255, 0.3);
 
-  /* Secondary Accents (Powder Blue) */
-  --color-secondary: #6C9BBB;
-  --color-secondary-hover: #4E7C9C;
-  --color-accent-cyan: #2A7B88;
-  --color-accent-cyan-alpha-12: rgba(42, 123, 136, 0.12);
-  --color-accent-cyan-alpha-30: rgba(42, 123, 136, 0.3);
-  --color-accent-pink: #C24A53;
-  --color-accent-violet-light: #5E191A;
+  /* Secondary Accents (#b0ff3d Radium) */
+  --color-secondary: #b0ff3d;
+  --color-secondary-hover: #c0ff66;
+  --color-accent-cyan: #b0ff3d;
+  --color-accent-cyan-alpha-12: rgba(176, 255, 61, 0.12);
+  --color-accent-cyan-alpha-30: rgba(176, 255, 61, 0.3);
+  --color-accent-pink: #8c3dff;
+  --color-accent-violet-light: #8c3dff;
 
   /* Status Colors */
-  --color-success: #1F8A4C;
-  --color-success-alpha-15: rgba(31, 138, 76, 0.15);
-  --color-success-alpha-30: rgba(31, 138, 76, 0.3);
-  --color-warning: #D97706;
-  --color-warning-alpha-12: rgba(217, 119, 6, 0.12);
-  --color-warning-alpha-30: rgba(217, 119, 6, 0.3);
-  --color-error: #DC2626;
-  --color-info: #2563EB;
+  --color-success: #10B981;
+  --color-success-alpha-15: rgba(16, 185, 129, 0.15);
+  --color-success-alpha-30: rgba(16, 185, 129, 0.3);
+  --color-warning: #F59E0B;
+  --color-warning-alpha-12: rgba(245, 158, 11, 0.12);
+  --color-warning-alpha-30: rgba(245, 158, 11, 0.3);
+  --color-error: #8c3dff;
+  --color-info: #b0ff3d;
 
-  /* Background Colors (Dominant Light Alabaster Canvas with Powder Blue Tints) */
-  --color-background: var(--color-alabaster-canvas);
-  --color-background-alt: var(--color-alabaster-alt);
-  --color-background-deep: #D6E0E9;
-  --color-background-grid: rgba(94, 25, 26, 0.05);
+  /* Background Colors (#212121 Root Background) */
+  --color-background: var(--bg-root);
+  --color-background-alt: #2A2A2A;
+  --color-background-deep: #1A1A1A;
+  --color-background-grid: rgba(255, 255, 255, 0.07);
 
-  /* Surface / Container Colors (White Cards with Powder Blue Borders) */
-  --color-surface: #FFFFFF;
-  --color-surface-hover: #F8FAFC;
-  --color-surface-nav: rgba(244, 247, 250, 0.92);
-  --color-surface-glass: rgba(255, 255, 255, 0.85);
+  /* Surface / Container Colors */
+  --color-surface: #2C2C2C;
+  --color-surface-hover: #363636;
+  --color-surface-nav: rgba(33, 33, 33, 0.92);
+  --color-surface-glass: rgba(33, 33, 33, 0.85);
 
-  /* Text Colors (High Contrast Night Bordeaux & Slate) */
-  --color-text: #1E293B;
-  --color-text-secondary: #334155;
-  --color-text-muted: #64748B;
-  --color-text-dark: #0F172A;
+  /* Text Colors (Optimized High Contrast for #212121 Background) */
+  --color-text: #F8FAFC;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #94A3B8;
+  --color-text-dark: #F8FAFC;
   --color-text-white: #FFFFFF;
-  --color-heading: #5E191A;
+  --color-heading: #b0ff3d;
 
   /* Border Colors */
-  --color-border: #CBD5E1;
-  --color-border-light: #E2E8F0;
-  --color-border-focus: var(--color-night-bordeaux);
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-border-focus: var(--color-powder-blue);
 
   /* ==========================================================================
-     2. GRADIENTS
+     2. TWO SOLID BRAND COLORS (NO GRADIENTS)
      ========================================================================== */
-  --gradient-primary: linear-gradient(135deg, #5E191A 0%, #7E2224 50%, #9ABFD8 100%);
-  --gradient-vibrant: linear-gradient(135deg, #9ABFD8 0%, #5E191A 50%, #7E2224 100%);
-  --gradient-text: linear-gradient(135deg, #5E191A 0%, #7E2224 60%, #1E293B 100%);
-  --gradient-edge: linear-gradient(90deg, #5E191A, #9ABFD8, #7E2224, #5E191A);
+  --gradient-primary: #8c3dff;
+  --gradient-vibrant: #b0ff3d;
+  --gradient-text: #b0ff3d;
+  --gradient-edge: #b0ff3d;
 
   /* ==========================================================================
      3. TYPOGRAPHY
@@ -151,13 +158,13 @@
   /* ==========================================================================
      6. SHADOWS & GLOWS
      ========================================================================== */
-  --shadow-sm: 0 2px 4px rgba(94, 25, 26, 0.05);
-  --shadow-md: 0 10px 25px -5px rgba(94, 25, 26, 0.1);
-  --shadow-lg: 0 20px 30px -10px rgba(94, 25, 26, 0.15);
-  --shadow-card: 0 15px 35px rgba(94, 25, 26, 0.08);
-  --glow-primary: 0 0 30px rgba(94, 25, 26, 0.2);
-  --glow-cyan: 0 0 30px rgba(154, 191, 216, 0.4);
-  --glow-vibrant: 0 0 35px rgba(94, 25, 26, 0.25);
+  --shadow-sm: 0 2px 4px rgba(140, 61, 255, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(140, 61, 255, 0.1);
+  --shadow-lg: 0 20px 30px -10px rgba(140, 61, 255, 0.15);
+  --shadow-card: 0 15px 35px rgba(176, 255, 61, 0.08);
+  --glow-primary: 0 0 30px rgba(140, 61, 255, 0.2);
+  --glow-cyan: 0 0 30px rgba(176, 255, 61, 0.4);
+  --glow-vibrant: 0 0 35px rgba(140, 61, 255, 0.25);
 
   /* ==========================================================================
      BACKWARDS COMPATIBILITY ALIASES
@@ -333,7 +340,7 @@
   align-items: center;
   gap: 0.6rem;
   font-size: var(--font-size-base);
-  box-shadow: 0 10px 25px -5px rgba(94, 25, 26, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(140, 61, 255, 0.4);
   transition: all 0.3s ease;
   text-decoration: none;
 }
@@ -341,12 +348,12 @@
 .landing-btn-primary:hover {
   background: var(--color-bordeaux-hover);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 35px -5px rgba(94, 25, 26, 0.6);
+  box-shadow: 0 15px 35px -5px rgba(140, 61, 255, 0.6);
   color: #FFFFFF;
 }
 
 .landing-btn-secondary {
-  background: rgba(94, 25, 26, 0.05);
+  background: rgba(176, 255, 61, 0.05);
   color: var(--color-night-bordeaux);
   font-weight: 700;
   font-family: var(--font-heading);
@@ -364,7 +371,7 @@
 }
 
 .landing-btn-secondary:hover {
-  background: rgba(94, 25, 26, 0.1);
+  background: rgba(176, 255, 61, 0.1);
   border-color: var(--color-night-bordeaux);
   color: var(--color-bordeaux-hover);
   transform: translateY(-2px);
@@ -377,8 +384,8 @@
   gap: 0.5rem;
   padding: 0.4rem 1rem;
   border-radius: var(--radius-full);
-  background: rgba(94, 25, 26, 0.08);
-  border: 1px solid rgba(94, 25, 26, 0.25);
+  background: rgba(140, 61, 255, 0.08);
+  border: 1px solid rgba(140, 61, 255, 0.25);
   color: var(--color-night-bordeaux);
   font-size: var(--font-size-sm);
   font-weight: 700;

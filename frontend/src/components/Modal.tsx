@@ -34,7 +34,7 @@ export function Modal({ open, title, onClose, children, wide, footer }: ModalPro
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className={`relative flex h-full w-full flex-col bg-white shadow-2xl outline-none sm:h-auto sm:max-h-[85vh] sm:rounded-lg sm:border sm:border-[var(--line)] ${
+        className={`relative flex h-full w-full flex-col bg-[var(--color-surface)] text-[var(--color-text)] shadow-2xl outline-none sm:h-auto sm:max-h-[85vh] sm:rounded-2xl sm:border sm:border-[var(--color-border)] ${
           wide ? 'sm:max-w-2xl' : 'sm:max-w-lg'
         }`}
       >

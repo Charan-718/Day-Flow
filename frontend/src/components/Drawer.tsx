@@ -50,7 +50,7 @@ export function Drawer({
         aria-labelledby={title ? 'drawer-title' : undefined}
         aria-label={!title ? ariaLabel : undefined}
         style={{ maxWidth }}
-        className="relative flex h-full w-full flex-col bg-white shadow-2xl outline-none"
+        className="relative flex h-full w-full flex-col bg-[var(--color-surface)] shadow-2xl outline-none"
       >
         {title && (
           <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
@@ -75,7 +75,7 @@ export function Drawer({
 
         <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
-        {footer && <div className="border-t border-[var(--line)] bg-white px-5 py-3">{footer}</div>}
+        {footer && <div className="border-t border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4">{footer}</div>}
       </div>
     </div>
   );

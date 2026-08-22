@@ -1,10 +1,10 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 const variants = {
-  primary: 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] border-transparent',
-  secondary: 'bg-white text-[var(--ink)] border-[var(--line)] hover:bg-[var(--bg)]',
-  danger: 'bg-[var(--danger)] text-white hover:opacity-90 border-transparent',
-  ghost: 'bg-transparent text-[var(--muted)] border-transparent hover:bg-[var(--bg)]',
+  primary: 'bg-[var(--color-primary)] text-white hover:opacity-90 border-transparent font-bold shadow-md',
+  secondary: 'bg-[var(--color-surface)] text-[var(--color-text)] border-[var(--color-border)] hover:bg-[var(--color-surface-hover)] font-semibold shadow-sm',
+  danger: 'bg-[var(--color-error)] text-white hover:opacity-90 border-transparent font-bold',
+  ghost: 'bg-transparent text-[var(--color-text-muted)] border-transparent hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
 };
 
 // DESIGN_SYSTEM §11.2 — 32 / 40 / 48px. `md` matches the original (unsized) button exactly,

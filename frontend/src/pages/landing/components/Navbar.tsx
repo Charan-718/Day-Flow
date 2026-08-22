@@ -62,7 +62,7 @@ export default function Navbar() {
 
         {/* RIGHT ACTION BUTTONS ONLY */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <nav style={{ display: 'flex', alignItems: 'center', gap: '1.1rem' }} aria-label="Sign in">
+          <nav style={{ display: 'none', alignItems: 'center', gap: '1.1rem' }} aria-label="Sign in">
             <Link
               to="/login?role=hr"
               style={{

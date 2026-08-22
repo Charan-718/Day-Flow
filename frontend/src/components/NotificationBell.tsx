@@ -50,13 +50,13 @@ export function NotificationBell() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
-        className="relative rounded-md p-2 text-[var(--nav-text)] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)]"
+        className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-white transition-colors cursor-pointer focus-visible:outline-none"
       >
-        <BellIcon size={19} />
+        <BellIcon size={18} />
         {unread > 0 && (
           <span
             aria-hidden="true"
-            className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--danger)] px-1 font-mono text-[11px] font-semibold text-white"
+            className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-primary)] px-1 font-mono text-[10px] font-bold text-white shadow-sm"
           >
             {unread > 9 ? '9+' : unread}
           </span>
@@ -66,7 +66,7 @@ export function NotificationBell() {
         <div
           role="menu"
           aria-label="Notifications"
-          className="absolute right-0 z-40 mt-2 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-[var(--line)] bg-white shadow-xl"
+          className="absolute right-0 z-40 mt-2 w-80 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-2xl"
         >
           <div className="flex items-center justify-between border-b border-[var(--line)] px-3 py-2.5">
             <span className="text-sm font-semibold text-[var(--ink)]">Notifications</span>

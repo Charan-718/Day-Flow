@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import SquareLoader from './SquareLoader';
 
 const DEMO_URL = 'https://drive.google.com/drive/folders/1v-TmT90R80MpL3KweY0_ie3kXrwHCmLz?usp=sharing';
@@ -147,8 +148,9 @@ export default function HeroSection() {
             }}
           >
             {/* TOP-LEFT CONNECTED CARD BUTTON: ADMIN (3D PARALLEL ROTATION) */}
-            <div
-              onClick={() => setActiveRole('admin')}
+            <Link
+              to="/login?role=hr"
+              onMouseEnter={() => setActiveRole('admin')}
               className="landing-vibrant-card"
               style={{
                 position: 'absolute',
@@ -170,6 +172,7 @@ export default function HeroSection() {
                 transform: `perspective(600px) rotateY(${tiltY}deg) translateX(${shiftX}px) ${activeRole === 'admin' ? 'scale(1.04)' : 'scale(1)'}`,
                 transition: 'all 0.3s ease',
                 transformStyle: 'preserve-3d',
+                textDecoration: 'none',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -177,7 +180,7 @@ export default function HeroSection() {
                 <circle cx="12" cy="11" r="3" />
               </svg>
               <span>Admin / HR Officer</span>
-            </div>
+            </Link>
 
             {/* LEFT CONNECTING LINE POINTER (ADMIN CARD -> MONITOR SCREEN) */}
             <svg
@@ -205,8 +208,9 @@ export default function HeroSection() {
             </svg>
 
             {/* TOP-RIGHT CONNECTED CARD BUTTON: EMPLOYEE (3D PARALLEL ROTATION) */}
-            <div
-              onClick={() => setActiveRole('employee')}
+            <Link
+              to="/login?role=employee"
+              onMouseEnter={() => setActiveRole('employee')}
               className="landing-vibrant-card"
               style={{
                 position: 'absolute',
@@ -228,6 +232,7 @@ export default function HeroSection() {
                 transform: `perspective(600px) rotateY(${tiltY}deg) translateX(${shiftX}px) ${activeRole === 'employee' ? 'scale(1.04)' : 'scale(1)'}`,
                 transition: 'all 0.3s ease',
                 transformStyle: 'preserve-3d',
+                textDecoration: 'none',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -235,7 +240,7 @@ export default function HeroSection() {
                 <circle cx="12" cy="7" r="4" />
               </svg>
               <span>Employee Portal</span>
-            </div>
+            </Link>
 
             {/* RIGHT CONNECTING LINE POINTER (EMPLOYEE CARD -> PC TOWER) */}
             <svg

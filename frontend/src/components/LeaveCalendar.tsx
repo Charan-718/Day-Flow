@@ -96,42 +96,45 @@ export function LeaveCalendar({
   });
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
-      <div className="rounded-lg border border-[var(--line)] bg-white p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-1">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(300px,1fr)] items-stretch w-full">
+      {/* Calendar Card */}
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-8 shadow-xl flex flex-col justify-between w-full min-h-[460px]">
+        {/* Calendar Header Toolbar */}
+        <div className="mb-6 flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => goToMonth(-1)}
               aria-label="Previous month"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-[var(--muted)] hover:bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-base font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
             >
               ‹
             </button>
+            <p className="min-w-[140px] text-center text-lg sm:text-xl font-black text-[var(--color-powder-blue)]" aria-live="polite">
+              {monthLabel}
+            </p>
             <button
               type="button"
               onClick={() => goToMonth(1)}
               aria-label="Next month"
-              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-[var(--muted)] hover:bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-base font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
             >
               ›
             </button>
-            <p className="ml-2 text-sm font-semibold text-[var(--ink)]" aria-live="polite">
-              {monthLabel}
-            </p>
           </div>
           <button
             type="button"
             onClick={goToday}
-            className="cursor-pointer rounded-md border border-[var(--border-control)] px-2.5 py-1 text-xs font-medium text-[var(--muted)] hover:bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            className="cursor-pointer rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-2 text-xs font-bold text-[var(--color-powder-blue)] hover:text-white transition-colors focus-visible:outline-none shadow-sm"
           >
             Today
           </button>
         </div>
 
-        <div role="grid" aria-label={monthLabel} className="grid grid-cols-7 gap-1 text-center text-xs">
+        {/* Calendar Grid */}
+        <div role="grid" aria-label={monthLabel} className="grid grid-cols-7 gap-1.5 sm:gap-2.5 text-center text-xs w-full">
           {WEEKDAYS.map((d) => (
-            <span key={d} role="columnheader" className="py-1 font-medium text-[var(--muted)]">
+            <span key={d} role="columnheader" className="py-2.5 font-bold uppercase tracking-wider text-[var(--color-text-secondary)] text-[11px]">
               {d}
             </span>
           ))}
@@ -166,21 +169,21 @@ export function LeaveCalendar({
                     ? `, ${dayRequests.length} time off request${dayRequests.length > 1 ? 's' : ''}`
                     : ''
                 }`}
-                className={`relative flex h-10 cursor-pointer flex-col items-center justify-center rounded-md text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-1 ${
+                className={`relative flex h-11 sm:h-12 lg:h-14 cursor-pointer flex-col items-center justify-center rounded-xl text-sm font-semibold transition-all focus-visible:outline-none ${
                   isSelected
-                    ? 'bg-[var(--accent)] text-white'
+                    ? 'bg-[var(--color-primary)] text-white shadow-lg font-bold scale-[1.03]'
                     : isToday
-                      ? 'border border-[var(--accent)] font-semibold text-[var(--accent)]'
+                      ? 'border-2 border-[var(--color-powder-blue)] text-[var(--color-powder-blue)] font-extrabold bg-[var(--color-background-deep)]'
                       : holiday
-                        ? 'font-semibold text-[var(--accent)] hover:bg-[var(--accent-soft)]'
-                        : 'text-[var(--ink)] hover:bg-[var(--bg)]'
+                        ? 'font-bold text-[var(--color-powder-blue)] bg-[var(--color-primary-alpha-12)] hover:bg-[var(--color-surface-hover)]'
+                        : 'text-[var(--color-text)] bg-[var(--color-background-deep)] hover:bg-[var(--color-surface-hover)] hover:text-white'
                 }`}
               >
-                {day}
+                <span>{day}</span>
                 {dayRequests.length > 0 && (
                   <span
-                    className={`absolute bottom-1 h-1 w-1 rounded-full ${
-                      isSelected ? 'bg-white' : STATUS_COLORS[dayRequests[0].status] || 'bg-[var(--line)]'
+                    className={`absolute bottom-1.5 h-1.5 w-1.5 rounded-full ${
+                      isSelected ? 'bg-white' : STATUS_COLORS[dayRequests[0].status] || 'bg-[var(--color-border)]'
                     }`}
                   />
                 )}
@@ -190,9 +193,11 @@ export function LeaveCalendar({
         </div>
       </div>
 
-      <aside className="space-y-4">
-        <div className="rounded-lg border border-[var(--line)] bg-white p-4">
-          <p className="mb-2 text-sm font-semibold text-[var(--ink)]">
+      {/* Right-Side Date Details & Information Panel */}
+      <aside className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl space-y-6">
+        {/* Selected Date Info Section */}
+        <div>
+          <p className="mb-2 text-base font-extrabold text-[var(--color-text)]">
             {selected
               ? new Date(`${selected}T00:00:00`).toLocaleDateString(undefined, {
                   weekday: 'long',
@@ -202,26 +207,26 @@ export function LeaveCalendar({
               : 'Select a date'}
           </p>
           {!selected && (
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-xs font-medium text-[var(--color-text-muted)] leading-relaxed">
               Click any day to see what's scheduled, or request time off for it.
             </p>
           )}
           {selected && selectedHoliday && (
-            <p className="mb-2 text-sm text-[var(--accent)]">🎉 {selectedHoliday.name}</p>
+            <p className="mb-3 text-sm font-bold text-[var(--color-powder-blue)]">🎉 {selectedHoliday.name}</p>
           )}
           {selected && selectedRequests.length > 0 && (
-            <ul className="space-y-2">
+            <ul className="space-y-3 mt-3">
               {selectedRequests.map((r) => (
-                <li key={r.id} className="rounded-md border border-[var(--line)] p-2">
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-[var(--ink)]">{r.leaveType.name}</span>
+                <li key={r.id} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] p-3.5">
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
+                    <span className="text-sm font-bold text-[var(--color-text)]">{r.leaveType.name}</span>
                     <StatusBadge status={r.status} />
                   </div>
-                  <p className="mb-2 text-xs text-[var(--muted)]">
+                  <p className="mb-3 text-xs font-mono text-[var(--color-text-muted)]">
                     {formatDate(r.startDate)} – {formatDate(r.endDate)}
                   </p>
                   {onViewRequest && (
-                    <Button type="button" size="sm" variant="secondary" onClick={() => onViewRequest(r.id)}>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => onViewRequest(r.id)} className="w-full justify-center">
                       View details
                     </Button>
                   )}
@@ -230,10 +235,10 @@ export function LeaveCalendar({
             </ul>
           )}
           {selected && selectedRequests.length === 0 && !selectedHoliday && (
-            <div>
-              <p className="mb-2 text-xs text-[var(--muted)]">No time off scheduled.</p>
+            <div className="mt-2">
+              <p className="mb-3 text-xs font-medium text-[var(--color-text-muted)]">No time off scheduled.</p>
               {onRequestDate && (
-                <Button type="button" size="sm" onClick={() => onRequestDate(selected)}>
+                <Button type="button" size="sm" onClick={() => onRequestDate(selected)} className="w-full justify-center font-bold">
                   Request time off
                 </Button>
               )}
@@ -241,33 +246,41 @@ export function LeaveCalendar({
           )}
         </div>
 
+        <hr className="border-t border-[var(--color-border)]/60" />
+
+        {/* Legend Section */}
         <div>
-          <p className="mb-2 text-sm font-medium">Legend</p>
-          <ul className="space-y-1 text-xs text-[var(--muted)]">
-            <li className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[var(--success)]" /> Approved
+          <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Legend</p>
+          <ul className="space-y-2.5 text-xs font-semibold text-[var(--color-text-secondary)]">
+            <li className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--success)] shadow-sm" /> Approved
             </li>
-            <li className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[var(--warning)]" /> Pending
+            <li className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--warning)] shadow-sm" /> Pending
             </li>
-            <li className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[var(--danger)]" /> Rejected
+            <li className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--danger)] shadow-sm" /> Rejected
             </li>
-            <li className="flex items-center gap-2">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[var(--accent)]" />{' '}
+            <li className="flex items-center gap-2.5">
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 border-[var(--color-powder-blue)]" />{' '}
               Public holiday
             </li>
           </ul>
         </div>
 
+        <hr className="border-t border-[var(--color-border)]/60" />
+
+        {/* Holidays Section */}
         <div>
-          <p className="mb-2 text-sm font-medium">Holidays in {monthLabel}</p>
-          <ul className="space-y-1 text-xs text-[var(--muted)]">
-            {monthHolidays.length === 0 && <li>None this month</li>}
+          <p className="mb-3 text-xs font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">Holidays in {monthLabel}</p>
+          <ul className="space-y-2 text-xs font-semibold text-[var(--color-text-secondary)]">
+            {monthHolidays.length === 0 && <li className="text-[var(--color-text-muted)] font-normal">None this month</li>}
             {monthHolidays.map((h) => (
-              <li key={h.id}>
-                {new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}:{' '}
-                {h.name}
+              <li key={h.id} className="flex items-center gap-2">
+                <span className="font-mono text-[var(--color-powder-blue)] font-bold">
+                  {new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}:
+                </span>{' '}
+                <span className="text-[var(--color-text)]">{h.name}</span>
               </li>
             ))}
           </ul>

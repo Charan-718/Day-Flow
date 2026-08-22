@@ -193,24 +193,31 @@ export function TimeOffPage() {
   }
 
   return (
-    <div>
+    <div className="w-full space-y-6 pb-12">
+      {/* 1. Page Header */}
       <PageHeader
         title="Time Off"
         subtitle={isAdmin ? 'Review and approve time off requests' : 'Track your balance and requests'}
         actions={
           !isAdmin ? (
             <Button
+              className="landing-btn-primary px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 text-sm shadow-md cursor-pointer"
               onClick={() => {
                 setRequestModalOpen(true);
                 create.reset();
               }}
             >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
               Request time off
             </Button>
           ) : undefined
         }
       />
 
+      {/* 2. Leave Balance Cards (3-column Grid) */}
       {!isAdmin && balances.data && (
         <StatStrip
           items={balances.data.map((b) => ({
@@ -220,10 +227,11 @@ export function TimeOffPage() {
         />
       )}
 
+      {/* 3. Main Workspace: Calendar & Date Information Panel */}
       {!isAdmin && (
-        <div className="mb-6">
+        <div className="my-6">
           {holidays.isLoading || calendarRequests.isLoading ? (
-            <LoadingSkeleton rows={4} />
+            <LoadingSkeleton rows={6} />
           ) : (
             <LeaveCalendar
               requests={calendarRequests.data?.items || []}
@@ -239,144 +247,171 @@ export function TimeOffPage() {
         </div>
       )}
 
-      <div role="group" aria-label="Filter by status" className="mb-4 flex flex-wrap gap-1.5">
-        {STATUS_TABS.map((tab, i) => {
-          const count = countQueries[i]?.data;
-          const isActive = statusFilter === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              // aria-current, not aria-pressed — these are mutually exclusive filter
-              // options (one "current" selection), not independent toggle buttons.
-              aria-current={isActive ? 'true' : undefined}
-              onClick={() => setStatusFilter(tab.key)}
-              className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
-                isActive
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                  : 'border-[var(--border-control)] bg-white text-[var(--muted)] hover:bg-[var(--bg)]'
-              }`}
-            >
-              {tab.label}
-              {typeof count === 'number' && (
-                <span
-                  className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-mono text-[11px] font-semibold ${
-                    isActive ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg)] text-[var(--muted)]'
-                  }`}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      {/* 4. Request Segmented Filter Tabs */}
+      <div className="pt-2">
+        <div role="group" aria-label="Filter by status" className="mb-6 flex flex-wrap items-center gap-2 border-b border-[var(--color-border)]/60 pb-4">
+          {STATUS_TABS.map((tab, i) => {
+            const count = countQueries[i]?.data;
+            const isActive = statusFilter === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                aria-current={isActive ? 'true' : undefined}
+                onClick={() => setStatusFilter(tab.key)}
+                className={`inline-flex h-9 cursor-pointer items-center gap-2 rounded-xl border px-4 text-sm font-bold transition-all focus-visible:outline-none ${
+                  isActive
+                    ? 'border-[var(--color-powder-blue)] bg-[var(--color-primary-alpha-12)] text-[var(--color-powder-blue)] shadow-sm'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-white'
+                }`}
+              >
+                {tab.label}
+                {typeof count === 'number' && (
+                  <span
+                    className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1.5 font-mono text-[11px] font-bold ${
+                      isActive ? 'bg-[var(--color-powder-blue)] text-[#212121]' : 'bg-[var(--color-background-deep)] text-[var(--color-text-muted)]'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {requests.isLoading && <TableSkeleton isAdmin={isAdmin} />}
-      {requests.isError && (
-        <ErrorState message={getApiError(requests.error).message} onRetry={() => requests.refetch()} />
-      )}
-      {empty && <EmptyState title={empty.title} hint={empty.hint} icon={empty.icon} />}
+      {/* 5. Time Off Requests Section */}
+      <div className="space-y-4">
+        <h2 className="text-lg sm:text-xl font-extrabold text-[var(--color-heading)] tracking-tight">
+          {isAdmin ? 'Time Off Requests for Review' : 'My Time-Off Requests'}
+        </h2>
 
-      {requests.data && requests.data.items.length > 0 && (
-        <>
-          {/* Desktop / tablet: table */}
-          <div className="hidden overflow-x-auto rounded-lg border border-[var(--line)] bg-white md:block">
-            <table className="w-full text-left text-sm">
-              <caption className="sr-only">Time off requests</caption>
-              <thead className="border-b border-[var(--line)] bg-[var(--bg)] text-[var(--muted)]">
-                <tr>
-                  {isAdmin && (
-                    <th scope="col" className="px-3 py-2.5 font-medium">
-                      Employee
-                    </th>
-                  )}
-                  <th scope="col" className="px-3 py-2.5 font-medium">
-                    Type
-                  </th>
-                  <th scope="col" className="px-3 py-2.5 font-medium">
-                    Dates
-                  </th>
-                  <th scope="col" className="px-3 py-2.5 text-right font-medium">
-                    Days
-                  </th>
-                  <th scope="col" className="px-3 py-2.5 font-medium">
-                    Status
-                  </th>
-                  <th scope="col" className="px-3 py-2.5 font-medium">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.data.items.map((r) => (
-                  <tr key={r.id} className="border-b border-[var(--line)] last:border-0 hover:bg-[var(--bg)]">
+        {requests.isLoading && <TableSkeleton isAdmin={isAdmin} />}
+        {requests.isError && (
+          <ErrorState message={getApiError(requests.error).message} onRetry={() => requests.refetch()} />
+        )}
+        {empty && (
+          <EmptyState
+            title={empty.title}
+            hint={empty.hint}
+            icon={empty.icon}
+            action={
+              !isAdmin && totalAllCount === 0 ? (
+                <Button
+                  className="landing-btn-primary px-5 py-2.5 rounded-xl font-bold inline-flex items-center gap-2 text-sm shadow-md cursor-pointer mt-2"
+                  onClick={() => {
+                    setRequestModalOpen(true);
+                    create.reset();
+                  }}
+                >
+                  Request time off
+                </Button>
+              ) : undefined
+            }
+          />
+        )}
+
+        {requests.data && requests.data.items.length > 0 && (
+          <>
+            {/* Desktop / tablet: table */}
+            <div className="hidden overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl md:block">
+              <table className="w-full text-left text-sm">
+                <caption className="sr-only">Time off requests</caption>
+                <thead className="border-b border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)]">
+                  <tr>
                     {isAdmin && (
-                      <td className="px-3 py-2.5">
-                        {r.employee ? `${r.employee.firstName} ${r.employee.lastName}` : '—'}
-                        {r.employee && (
-                          <div className="font-mono text-xs text-[var(--muted)]">
-                            {r.employee.employeeCode}
-                          </div>
-                        )}
-                      </td>
+                      <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">
+                        Employee
+                      </th>
                     )}
-                    <td className="px-3 py-2.5">{r.leaveType.name}</td>
-                    <td className="px-3 py-2.5 text-[var(--muted)]">
-                      {formatDate(r.startDate)} – {formatDate(r.endDate)}
-                    </td>
-                    <td className="px-3 py-2.5 text-right font-mono">{r.daysRequested}</td>
-                    <td className="px-3 py-2.5">
-                      <StatusBadge status={r.status} />
-                    </td>
-                    <td className="px-3 py-2.5 text-right">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setReviewingId(r.id)}
-                        aria-label={`${isAdmin && r.status === 'PENDING' ? 'Review' : 'View'} ${r.leaveType.name} request${
-                          isAdmin && r.employee ? ` for ${r.employee.firstName} ${r.employee.lastName}` : ''
-                        }, ${formatDate(r.startDate)} to ${formatDate(r.endDate)}`}
-                      >
-                        {isAdmin && r.status === 'PENDING' ? 'Review' : 'View'}
-                      </Button>
-                    </td>
+                    <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">
+                      Type
+                    </th>
+                    <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">
+                      Dates
+                    </th>
+                    <th scope="col" className="px-5 py-4 text-right font-bold uppercase text-xs tracking-wider">
+                      Days
+                    </th>
+                    <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-border)]/50">
+                  {requests.data.items.map((r) => (
+                    <tr key={r.id} className="hover:bg-[var(--color-surface-hover)] transition-colors">
+                      {isAdmin && (
+                        <td className="px-5 py-4 font-semibold text-[var(--color-text)]">
+                          {r.employee ? `${r.employee.firstName} ${r.employee.lastName}` : '—'}
+                          {r.employee && (
+                            <div className="font-mono text-xs text-[var(--color-powder-blue)]">
+                              {r.employee.employeeCode}
+                            </div>
+                          )}
+                        </td>
+                      )}
+                      <td className="px-5 py-4 font-semibold text-[var(--color-text)]">{r.leaveType.name}</td>
+                      <td className="px-5 py-4 text-sm text-[var(--color-text-secondary)]">
+                        {formatDate(r.startDate)} – {formatDate(r.endDate)}
+                      </td>
+                      <td className="px-5 py-4 text-right font-mono font-semibold text-[var(--color-text)]">{r.daysRequested}</td>
+                      <td className="px-5 py-4">
+                        <StatusBadge status={r.status} />
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setReviewingId(r.id)}
+                          aria-label={`${isAdmin && r.status === 'PENDING' ? 'Review' : 'View'} ${r.leaveType.name} request${
+                            isAdmin && r.employee ? ` for ${r.employee.firstName} ${r.employee.lastName}` : ''
+                          }, ${formatDate(r.startDate)} to ${formatDate(r.endDate)}`}
+                        >
+                          {isAdmin && r.status === 'PENDING' ? 'Review' : 'View'}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-          {/* Mobile: card list (DESIGN_SYSTEM §7.1) */}
-          <div className="space-y-3 md:hidden">
-            {requests.data.items.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                onClick={() => setReviewingId(r.id)}
-                className="w-full rounded-lg border border-[var(--line)] bg-white p-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    {isAdmin && r.employee && (
-                      <p className="truncate text-sm font-semibold text-[var(--ink)]">
-                        {r.employee.firstName} {r.employee.lastName}
+            {/* Mobile: card list */}
+            <div className="space-y-3 md:hidden">
+              {requests.data.items.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setReviewingId(r.id)}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-left shadow-md focus-visible:outline-none cursor-pointer hover:border-[var(--color-powder-blue)]/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      {isAdmin && r.employee && (
+                        <p className="truncate text-sm font-bold text-[var(--color-text)]">
+                          {r.employee.firstName} {r.employee.lastName}
+                        </p>
+                      )}
+                      <p className="text-sm font-semibold text-[var(--color-text)]">{r.leaveType.name}</p>
+                      <p className="mt-1 text-xs font-mono text-[var(--color-text-secondary)]">
+                        {formatDate(r.startDate)} – {formatDate(r.endDate)} · {r.daysRequested} day
+                        {r.daysRequested === 1 ? '' : 's'}
                       </p>
-                    )}
-                    <p className="text-sm text-[var(--ink)]">{r.leaveType.name}</p>
-                    <p className="mt-0.5 text-xs text-[var(--muted)]">
-                      {formatDate(r.startDate)} – {formatDate(r.endDate)} · {r.daysRequested} day
-                      {r.daysRequested === 1 ? '' : 's'}
-                    </p>
+                    </div>
+                    <StatusBadge status={r.status} />
                   </div>
-                  <StatusBadge status={r.status} />
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
 
       <Modal
         open={requestModalOpen}

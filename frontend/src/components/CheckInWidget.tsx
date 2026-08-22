@@ -52,19 +52,21 @@ export function CheckInWidget() {
 
   return (
     <div
-      className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 sm:px-2.5 sm:py-1.5"
+      className="flex items-center gap-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-3 py-1.5 shadow-sm"
       title={statusLabel}
     >
-      <AttendanceDot checkedIn={isCheckedIn} />
-      <span className="hidden font-mono text-xs text-[var(--nav-muted)] sm:inline">
-        {isCheckedIn ? formatElapsed(data?.checkIn ?? null) : 'Out'}
-      </span>
+      <div className="flex items-center gap-1.5">
+        <AttendanceDot checkedIn={isCheckedIn} />
+        <span className="hidden font-mono text-xs font-bold text-[var(--color-text-secondary)] sm:inline">
+          {isCheckedIn ? formatElapsed(data?.checkIn ?? null) : 'Out'}
+        </span>
+      </div>
       <button
         type="button"
         disabled={mutation.isPending}
         onClick={() => mutation.mutate()}
         aria-label={`${isCheckedIn ? 'Check out' : 'Check in'}. ${statusLabel}.`}
-        className="cursor-pointer rounded bg-[var(--accent)] px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-[var(--accent-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)]"
+        className="cursor-pointer rounded-lg bg-[var(--color-primary)] px-3 py-1 text-xs font-black text-white shadow-md transition-all hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none"
       >
         {mutation.isPending ? '…' : isCheckedIn ? 'Check Out' : 'Check In'}
       </button>

@@ -1,80 +1,232 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
+/* 
+  ==========================================================================
+  DayFlow Centralized CSS Design Token System (Light Theme Palette)
+  Palette:
+  - Alabaster Grey (#E0E4E8 / #F4F7FA) -> Main Light Canvas & Background
+  - Powder Blue (#9ABFD8) -> Hero Background Accents, Card Highlights & Ambient Tints
+  - Night Bordeaux (#5E191A) -> High Impact Buttons, Typography, Logos & Badges
+  ==========================================================================
+*/
+
 :root {
-  /* DESIGN_SYSTEM §1.3 — unified with the landing page's brand palette (Night Bordeaux /
-     Powder Blue / Alabaster). Values below are tuned, not copied 1:1 from landing.css:
-     several of landing's own semantic colors (muted text, success, warning) sit just under
-     4.5:1 on our backgrounds, so they're darkened here to clear AA — every pair below is
-     re-verified, ratios noted per line. */
-  --bg: #f4f7fa;
-  --surface: #ffffff;
-  --ink: #1e293b;
-  --muted: #5a6675;
-  --line: #cbd5e1;
-  --accent: #5e191a;
-  --accent-hover: #7e2224;
-  --accent-soft: #efe8e8;
-  /* Secondary brand color (Powder Blue). Non-text use only — white-on-secondary is 1.94:1
-     and fails AA, so it's for icons/borders/soft fills, never a solid button with text. */
-  --secondary: #6c9bbb;
-  --secondary-soft: #e7eff4;
-  --danger: #b91c1c;
-  --danger-soft: #f7e4e4;
-  --warning: #9a5b0a;
-  --warning-soft: #f3ebe2;
-  --success: #0f7a3d;
-  --success-soft: #e2efe8;
-  /* DESIGN_SYSTEM §1.2 — separates "on leave" from --accent so links/primary actions
-     stay the only thing that reads as interactive. Verified 5.17:1 / 4.65:1 on soft. */
-  --info: #2563eb;
-  --info-soft: #eef3fd;
-  --nav: #3a0c0d;
-  --nav-text: #f3e8e8;
-  --nav-muted: #d9b8b9;
-  --shadow: 0 1px 2px rgba(94, 25, 26, 0.06);
-  --shadow-md: 0 8px 16px rgba(94, 25, 26, 0.1), 0 2px 4px rgba(94, 25, 26, 0.06);
-  --shadow-lg: 0 20px 32px rgba(94, 25, 26, 0.16), 0 4px 8px rgba(94, 25, 26, 0.08);
-  /* DESIGN_SYSTEM §1.2 — control boundaries need 3:1 contrast; --line (1.48:1) is for
-     decorative dividers only. Verified 3.48:1 on white, 3.19:1 on canvas — unchanged, this
-     neutral doesn't need to carry the brand hue. */
-  --border-control: #7d8b9a;
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
-  color: var(--ink);
-  background: var(--bg);
-  line-height: 1.5;
+  /* USER PALETTE CORE CONSTANTS */
+  --bg-root: #212121;
+  --background-root: #212121;
+  --bg-primary: #212121;
+  --background: #212121;
+  --color-dark-charcoal: #212121;
+
+  /* Red / Maroon Replacement (#8c3dff Violet) */
+  --color-maroon: #8c3dff;
+  --color-red-vibrant: #8c3dff;
+  --color-night-bordeaux: #8c3dff;
+  --color-bordeaux-main: #8c3dff;
+  --color-bordeaux-hover: #a259ff;
+  --color-bordeaux-deep: #661acb;
+  --color-bordeaux-alpha-08: rgba(140, 61, 255, 0.08);
+  --color-bordeaux-alpha-15: rgba(140, 61, 255, 0.15);
+  --color-bordeaux-alpha-30: rgba(140, 61, 255, 0.3);
+
+  /* Powder Blue Replacement (#b0ff3d Radium) */
+  --color-powder-blue: #b0ff3d;
+  --color-powder-blue-light: rgba(176, 255, 61, 0.12);
+  --color-powder-blue-card: rgba(176, 255, 61, 0.18);
+  --color-powder-blue-dark: #97e624;
+  --color-alabaster-grey: #E0E4E8;
+
+  /* Alabaster & Clean Background Tokens */
+  --color-alabaster-canvas: #F4F7FA;
+  --color-alabaster-alt: #E8EEF4;
+  --color-alabaster-card: #FFFFFF;
+
+  /* ==========================================================================
+     1. SEMANTIC COLOR TOKENS
+     ========================================================================== */
+
+  /* Primary Action & Brand (#8c3dff Violet) */
+  --color-primary: #8c3dff;
+  --color-primary-hover: #a259ff;
+  --color-primary-alpha-12: rgba(140, 61, 255, 0.12);
+  --color-primary-alpha-30: rgba(140, 61, 255, 0.3);
+
+  /* Secondary Accents (#b0ff3d Radium) */
+  --color-secondary: #b0ff3d;
+  --color-secondary-hover: #c0ff66;
+  --color-accent-cyan: #b0ff3d;
+  --color-accent-cyan-alpha-12: rgba(176, 255, 61, 0.12);
+  --color-accent-cyan-alpha-30: rgba(176, 255, 61, 0.3);
+  --color-accent-pink: #8c3dff;
+  --color-accent-violet-light: #8c3dff;
+
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-alpha-15: rgba(16, 185, 129, 0.15);
+  --color-success-alpha-30: rgba(16, 185, 129, 0.3);
+  --color-warning: #F59E0B;
+  --color-warning-alpha-12: rgba(245, 158, 11, 0.12);
+  --color-warning-alpha-30: rgba(245, 158, 11, 0.3);
+  --color-error: #8c3dff;
+  --color-info: #b0ff3d;
+
+  /* Background Colors (#212121 Root Background) */
+  --color-background: var(--bg-root);
+  --color-background-alt: #2A2A2A;
+  --color-background-deep: #1A1A1A;
+  --color-background-grid: rgba(255, 255, 255, 0.07);
+
+  /* Surface / Container Colors */
+  --color-surface: #2C2C2C;
+  --color-surface-hover: #363636;
+  --color-surface-nav: rgba(33, 33, 33, 0.92);
+  --color-surface-glass: rgba(33, 33, 33, 0.85);
+
+  /* Text Colors (Optimized High Contrast for #212121 Background) */
+  --color-text: #F8FAFC;
+  --color-text-secondary: #CBD5E1;
+  --color-text-muted: #94A3B8;
+  --color-text-dark: #F8FAFC;
+  --color-text-white: #FFFFFF;
+  --color-heading: #b0ff3d;
+
+  /* Border Colors */
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-border-focus: var(--color-powder-blue);
+
+  /* ==========================================================================
+     2. TWO SOLID BRAND COLORS (NO GRADIENTS)
+     ========================================================================== */
+  --gradient-primary: #8c3dff;
+  --gradient-vibrant: #b0ff3d;
+  --gradient-text: #b0ff3d;
+  --gradient-edge: #b0ff3d;
+
+  /* ==========================================================================
+     3. TYPOGRAPHY
+     ========================================================================== */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+
+  --font-size-xs: 0.75rem;       /* 12px */
+  --font-size-sm: 0.875rem;      /* 14px */
+  --font-size-base: 1rem;        /* 16px */
+  --font-size-md: 1.618rem;      /* ~25.9px */
+  --font-size-lg: 2.618rem;      /* ~41.9px */
+  --font-size-xl: 4.236rem;      /* ~67.8px */
+  --font-size-display: 5.5rem;   /* Hero Headline */
+
+  --leading-tight: 1.15;
+  --leading-normal: 1.618;
+  --leading-loose: 1.8;
+
+  /* ==========================================================================
+     4. SPACING
+     ========================================================================== */
+  --spacing-xs: 0.25rem;         /* 4px */
+  --spacing-sm: 0.5rem;          /* 8px */
+  --spacing-md: 1rem;            /* 16px */
+  --spacing-lg: 1.5rem;          /* 24px */
+  --spacing-xl: 2.5rem;          /* 40px */
+  --spacing-2xl: 4rem;           /* 64px */
+
+  /* ==========================================================================
+     5. BORDERS & RADIUS
+     ========================================================================== */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* ==========================================================================
+     6. SHADOWS & GLOWS
+     ========================================================================== */
+  --shadow-sm: 0 2px 4px rgba(140, 61, 255, 0.1);
+  --shadow-md: 0 10px 25px -5px rgba(140, 61, 255, 0.25);
+  --shadow-lg: 0 20px 30px -10px rgba(140, 61, 255, 0.35);
+  --shadow-card: 0 15px 35px rgba(176, 255, 61, 0.12);
+  --glow-primary: 0 0 30px rgba(140, 61, 255, 0.4);
+  --glow-cyan: 0 0 30px rgba(176, 255, 61, 0.5);
+  --glow-vibrant: 0 0 35px rgba(140, 61, 255, 0.4);
+
+  /* ==========================================================================
+     BACKWARDS COMPATIBILITY ALIASES
+     ========================================================================== */
+  --bg-dominant: var(--color-background);
+  --bg-dominant-alt: var(--color-background-alt);
+  --bg-grid-line: var(--color-background-grid);
+  --surface-card: var(--color-surface);
+  --surface-card-hover: var(--color-surface-hover);
+  --surface-nav: var(--color-surface-nav);
+  --surface-glass: var(--color-surface-glass);
+  --border-secondary: var(--color-border);
+  --border-secondary-light: var(--color-border-light);
+  --accent-primary: var(--color-primary);
+  --accent-secondary: var(--color-secondary);
+  --accent-cyan: var(--color-accent-cyan);
+  --accent-emerald: var(--color-success);
+  --accent-amber: var(--color-warning);
+  --accent-pink: var(--color-accent-pink);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --text-dark: var(--color-text-dark);
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-md: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-display: var(--font-size-display);
+
+  /* Application legacy token aliases */
+  --bg: var(--color-background);
+  --surface: var(--color-surface);
+  --ink: var(--color-text);
+  --muted: var(--color-text-muted);
+  --line: var(--color-border);
+  --accent: var(--color-primary);
+  --accent-hover: var(--color-primary-hover);
+  --accent-soft: var(--color-primary-alpha-12);
+  --secondary: var(--color-secondary);
+  --secondary-soft: var(--color-accent-cyan-alpha-12);
+  --danger: var(--color-error);
+  --danger-soft: var(--color-primary-alpha-12);
+  --warning: var(--color-warning);
+  --warning-soft: var(--color-warning-alpha-12);
+  --success: var(--color-success);
+  --success-soft: var(--color-success-alpha-15);
+  --info: var(--color-info);
+  --info-soft: var(--color-accent-cyan-alpha-12);
+  --nav: var(--color-surface-nav);
+  --nav-text: var(--color-text);
+  --nav-muted: var(--color-text-muted);
+  --border-control: var(--color-border-light);
 }
 
-* {
+/* GLOBAL RESETS & BASE STYLES */
+*, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* DESIGN_SYSTEM §10 — baseline focus indicator for any interactive element that doesn't
-   define its own Tailwind focus-visible ring. Never removes an existing ring; the two can
-   coexist harmlessly where a component also sets one explicitly. */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 0% 0%, rgba(94, 25, 26, 0.05), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(108, 155, 187, 0.08), transparent 50%),
-    var(--bg);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 #root {
@@ -93,6 +245,244 @@ a {
   text-decoration: none;
 }
 
-.font-mono {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* BACKGROUND GRID PATTERN (SOLID SVG MESH - NO GRADIENTS) */
+.bg-grid-pattern {
+  background-color: var(--color-background);
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(255, 255, 255, 0.06)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* GOLDEN RATIO TYPOGRAPHY CLASSES */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  color: var(--color-heading);
+  letter-spacing: -0.025em;
+}
+
+.text-display {
+  font-size: clamp(2.8rem, 6vw, var(--font-size-display));
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+.text-xl {
+  font-size: clamp(2rem, 4vw, var(--font-size-xl));
+}
+
+.text-lg {
+  font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
+}
+
+.text-md {
+  font-size: clamp(1.2rem, 2vw, var(--font-size-md));
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+}
+
+.text-gradient {
+  color: var(--color-powder-blue) !important;
+  background: transparent !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: var(--color-powder-blue) !important;
+  background-clip: initial !important;
+}
+
+.text-gradient-vibrant {
+  color: var(--color-night-bordeaux) !important;
+  background: transparent !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: var(--color-night-bordeaux) !important;
+  background-clip: initial !important;
+}
+
+/* CARD CONTAINERS (SOLID ACCENTS) */
+.vibrant-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.vibrant-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-powder-blue);
+  opacity: 0.8;
+  transition: opacity 0.35s ease;
+}
+
+.vibrant-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-powder-blue);
+  box-shadow: var(--shadow-lg);
+}
+
+.vibrant-card:hover::before {
+  opacity: 1;
+  background: var(--color-night-bordeaux);
+}
+
+/* CLEAN BORDER CONTAINER (SOLID BORDER - NO GRADIENTS) */
+.glowing-border-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  transition: border-color 0.3s ease;
+}
+
+.glowing-border-wrap:hover {
+  border-color: var(--color-powder-blue);
+}
+
+.glowing-border-inner {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  height: 100%;
+  width: 100%;
+}
+
+/* BUTTONS WITH VIBRANT ACCENTS */
+.btn-primary {
+  background: var(--color-night-bordeaux);
+  color: var(--color-text-white);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-base);
+  box-shadow: 0 10px 25px -5px rgba(140, 61, 255, 0.4);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: var(--color-bordeaux-hover);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 35px -5px rgba(140, 61, 255, 0.6);
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  background: rgba(176, 255, 61, 0.08);
+  color: var(--color-powder-blue);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(176, 255, 61, 0.3);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-base);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background: rgba(176, 255, 61, 0.18);
+  border-color: var(--color-powder-blue);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* BADGES */
+.badge-vibrant {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  background: rgba(225, 32, 30, 0.12);
+  border: 1px solid rgba(225, 32, 30, 0.35);
+  color: #ff5250;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+/* ANIMATION UTILITIES */
+.animate-float {
+  animation: floatSubtle 6s ease-in-out infinite;
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-powder-blue);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-night-bordeaux);
+}
+
+/* SQUARE LOADER ANIMATIONS */
+@keyframes squareSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes squarePulse {
+  0% { transform: scale(0.6); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* HIDE DEFAULT MODEL VIEWER PROGRESS BAR LINE */
+model-viewer::part(default-progress-bar) {
+  display: none !important;
 }

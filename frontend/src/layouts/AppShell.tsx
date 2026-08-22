@@ -18,17 +18,17 @@ const NAV_ITEMS = [
 ];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-md px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)] ${
+  `relative flex items-center h-16 px-1 text-sm font-bold transition-colors focus-visible:outline-none ${
     isActive
-      ? 'border-b-2 border-[var(--accent)] text-white'
-      : 'text-[var(--nav-muted)] hover:text-white'
+      ? 'text-[var(--color-powder-blue)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--color-powder-blue)]'
+      : 'text-[var(--color-text-secondary)] hover:text-white'
   }`;
 
 const drawerNavLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex h-12 items-center rounded-md px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
+  `flex h-12 items-center rounded-xl px-3 text-sm font-bold transition-colors ${
     isActive
-      ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
-      : 'text-[var(--ink)] hover:bg-[var(--bg)]'
+      ? 'bg-[var(--color-primary-alpha-12)] text-[var(--color-powder-blue)]'
+      : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'
   }`;
 
 export function AppShell() {
@@ -51,63 +51,74 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-[var(--nav)] text-[var(--nav-text)]">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
-          <button
-            type="button"
-            onClick={() => setMobileNavOpen(true)}
-            aria-label="Open navigation menu"
-            className="-ml-1 rounded-md p-2 text-[var(--nav-text)] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)] md:hidden"
-          >
-            <MenuIcon size={22} />
-          </button>
+    <div className="min-h-screen bg-[var(--color-background)]">
+      {/* 64px Fixed Height Full-Width Navbar */}
+      <header className="sticky top-0 z-30 h-16 w-full border-b border-[var(--color-border)] bg-[var(--color-surface)] shadow-md">
+        <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+          {/* LEFT: Logo & Brand */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              aria-label="Open navigation menu"
+              className="-ml-1 rounded-xl p-2 text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-white md:hidden focus-visible:outline-none"
+            >
+              <MenuIcon size={22} />
+            </button>
 
-          <NavLink to="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
-            {company.data?.logoUrl ? (
-              <img src={company.data.logoUrl} alt="" className="h-7 w-7 rounded object-cover" />
-            ) : (
-              <span className="flex h-7 w-7 items-center justify-center rounded bg-[var(--accent)] text-xs font-bold text-white">
-                {company.data?.code?.slice(0, 2) || 'Df'}
-              </span>
-            )}
-            {company.data?.name || 'Dayflow'}
-          </NavLink>
+            <NavLink to="/" className="flex items-center gap-2.5 font-black text-lg tracking-tight text-[var(--color-powder-blue)] shrink-0">
+              {company.data?.logoUrl ? (
+                <img src={company.data.logoUrl} alt="" className="h-8 w-8 rounded-xl object-cover" />
+              ) : (
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary)] text-xs font-extrabold text-white shadow-md">
+                  {company.data?.code?.slice(0, 2) || 'DF'}
+                </span>
+              )}
+              <span>{company.data?.name || 'DayFlow'}</span>
+            </NavLink>
 
-          <nav className="ml-2 hidden items-center gap-1 md:flex">
-            {visibleItems.map((item) => (
-              <NavLink key={item.to} to={item.to} className={navLinkClass}>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
+            {/* CENTER: Main Navigation Links */}
+            <nav className="ml-8 hidden items-center gap-6 lg:gap-8 md:flex h-full">
+              {visibleItems.map((item) => (
+                <NavLink key={item.to} to={item.to} className={navLinkClass}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
 
-          <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+          {/* RIGHT: Controls, Notification & User Profile */}
+          <div className="flex items-center gap-3 sm:gap-5">
             {user?.employeeId && <CheckInWidget />}
             <NotificationBell />
+
+            {/* User Profile */}
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-1.5 rounded-md px-2 py-1.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)]"
+                className="flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none cursor-pointer"
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-alpha-12)] text-sm font-bold text-[var(--color-powder-blue)] border border-[var(--color-border)] shadow-sm">
                   {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
                 </span>
-                <span className="hidden text-sm sm:inline">{user?.firstName || user?.loginId}</span>
-                <CaretDownIcon size={14} className="hidden text-[var(--nav-muted)] sm:block" />
+                <span className="hidden text-sm font-bold text-[var(--color-text)] sm:inline">
+                  {user?.firstName || user?.loginId}
+                </span>
+                <CaretDownIcon size={14} className="hidden text-[var(--color-text-muted)] sm:block" />
               </button>
+
               {menuOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 z-40 mt-1.5 w-48 overflow-hidden rounded-lg border border-[var(--line)] bg-white py-1 shadow-lg"
+                  className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] py-2 shadow-2xl"
                 >
                   <button
                     type="button"
                     role="menuitem"
-                    className="block w-full px-3 py-2 text-left text-sm text-[var(--ink)] hover:bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
+                    className="block w-full px-4 py-2.5 text-left text-sm font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
                     onClick={() => {
                       setMenuOpen(false);
                       navigate('/profile');
@@ -118,10 +129,13 @@ export function AppShell() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="block w-full px-3 py-2 text-left text-sm text-[var(--danger)] hover:bg-[var(--bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]"
-                    onClick={handleLogout}
+                    className="block w-full px-4 py-2.5 text-left text-sm font-bold text-[#ff7b79] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      logout();
+                    }}
                   >
-                    Log Out
+                    Sign out
                   </button>
                 </div>
               )}
@@ -130,7 +144,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6">
+      <main className="w-full max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 flex flex-col flex-1 min-h-[calc(100dvh-64px)] space-y-6 lg:space-y-8">
         <Outlet />
       </main>
 
@@ -189,8 +203,8 @@ export function AppShell() {
 
 export function AuthLayout() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="bg-grid-pattern flex min-h-screen w-full items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-[80vw] min-h-[90vh] flex flex-col justify-center">
         <Outlet />
       </div>
     </div>
