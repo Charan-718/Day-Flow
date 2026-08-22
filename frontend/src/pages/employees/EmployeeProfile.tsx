@@ -6,6 +6,8 @@ import { updateSalaryFromWage } from '../../services/payroll';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../components/Toast';
 import { Button } from '../../components/Button';
+import { AvatarUpload } from '../../components/AvatarUpload';
+import { StatusBadge } from '../../components/StatusBadge';
 import { ErrorState, PageHeader } from '../../components/ui';
 import { getApiError } from '../../api/client';
 
@@ -174,24 +176,50 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
 
   return (
     <div>
-      <PageHeader
-        title={`${emp.firstName} ${emp.lastName}`}
-        subtitle={`${emp.designation || '—'} · ${emp.employeeCode}`}
-        actions={
-          <div className="flex gap-2">
-            {isAdmin && !self && (
-              <Link to={`/employees/${employeeId}/360`}>
-                <Button variant="secondary">360° View</Button>
-              </Link>
-            )}
-            {canEdit && editableOnThisTab && !editing && (
-              <Button variant="secondary" onClick={startEditing}>
-                Edit
-              </Button>
-            )}
+      {/* Profile header — identity first, then the facts people look up most often. */}
+      <section className="mb-5 overflow-hidden rounded-lg border border-[var(--line)] bg-white shadow-[var(--shadow)]">
+        <div className="h-16 bg-[var(--nav)] sm:h-20" aria-hidden="true" />
+        <div className="px-5 pb-5">
+          <div className="-mt-10 flex flex-col gap-4 sm:-mt-12 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-end">
+              <AvatarUpload
+                employeeId={employeeId}
+                currentUrl={emp.profilePictureUrl as string | null}
+                firstName={String(emp.firstName || '')}
+                lastName={String(emp.lastName || '')}
+                editable={canEdit}
+                size={96}
+              />
+              <div className="pb-1 text-center sm:pb-2 sm:text-left">
+                <h1 className="text-xl font-semibold tracking-tight text-[var(--ink)]">
+                  {String(emp.firstName || '')} {String(emp.lastName || '')}
+                </h1>
+                <p className="mt-0.5 text-sm text-[var(--muted)]">
+                  {String(emp.designation || '—')} · <span className="font-mono">{String(emp.employeeCode || '')}</span>
+                </p>
+                {emp.accountStatus ? (
+                  <span className="mt-2 inline-flex">
+                    <StatusBadge status={String(emp.accountStatus)} />
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="flex shrink-0 justify-center gap-2 sm:justify-end sm:pb-2">
+              {isAdmin && !self && (
+                <Link to={`/employees/${employeeId}/360`}>
+                  <Button variant="secondary">360° View</Button>
+                </Link>
+              )}
+              {canEdit && editableOnThisTab && !editing && (
+                <Button variant="secondary" onClick={startEditing}>
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
-        }
-      />
+        </div>
+      </section>
 
       <div role="tablist" aria-label="Profile sections" className="mb-4 flex gap-1 border-b border-[var(--line)]">
         {tabs.map((t) => (

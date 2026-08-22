@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { AnyZodObject, ZodError } from 'zod';
+import { ZodError, ZodTypeAny } from 'zod';
 import { sendError } from '../utils/responseEnvelope';
 
 type RequestPart = 'body' | 'query' | 'params';
 
-export function validate(schema: AnyZodObject, part: RequestPart = 'body') {
+// ZodTypeAny (not AnyZodObject) so schemas using .refine()/.superRefine() — e.g. the
+// register schema's password-confirmation check — can be validated too.
+export function validate(schema: ZodTypeAny, part: RequestPart = 'body') {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const parsed = schema.parse(req[part]);

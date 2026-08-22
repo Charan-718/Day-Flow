@@ -27,3 +27,28 @@ export async function changePassword(currentPassword: string, newPassword: strin
   });
   return data.data;
 }
+
+export interface RegisterPayload {
+  companyName: string;
+  companyLogoFileName?: string;
+  companyLogoBase64?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}
+
+/** HR / company bootstrap. The API refuses once an organisation exists. */
+export async function register(payload: RegisterPayload) {
+  const { data } = await api.post<
+    ApiSuccess<{ token: string; user: AuthUser; company: { name: string; code: string } }>
+  >('/auth/register', payload);
+  return data.data;
+}
+
+export async function getRegistrationStatus() {
+  const { data } = await api.get<ApiSuccess<{ open: boolean }>>('/auth/registration-status');
+  return data.data;
+}

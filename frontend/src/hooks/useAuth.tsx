@@ -16,6 +16,8 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  /** Adopts a session created outside the login form (e.g. HR sign-up). */
+  applySession: (token: string, user: AuthUser) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -62,6 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return u;
   }, []);
 
+  const applySession = useCallback((token: string, u: AuthUser) => {
+    localStorage.setItem('dayflow_token', token);
+    setUser(u);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
@@ -73,8 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, logout, refresh }),
-    [user, loading, login, logout, refresh]
+    () => ({ user, loading, login, logout, refresh, applySession }),
+    [user, loading, login, logout, refresh, applySession]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

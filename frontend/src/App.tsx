@@ -3,9 +3,10 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import { ToastProvider } from './components/Toast';
 import { AppShell, AuthLayout } from './layouts/AppShell';
-import { RequireAuth, RequireRole, RoleLanding } from './routes/guards';
+import { HomeRoute, RequireAuth, RequireRole } from './routes/guards';
 import { LoginPage } from './pages/auth/Login';
 import { ChangePasswordPage } from './pages/auth/ChangePassword';
+import { SignUpPage } from './pages/auth/SignUp';
 import { EmployeeDirectory } from './pages/employees/EmployeeDirectory';
 import { EmployeeProfile } from './pages/employees/EmployeeProfile';
 import { Employee360Page } from './pages/employees/Employee360';
@@ -27,14 +28,17 @@ export default function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
+              {/* Public marketing page; redirects to the app when already signed in. */}
+              <Route path="/" element={<HomeRoute />} />
+
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/change-password" element={<ChangePasswordPage />} />
               </Route>
 
               <Route element={<RequireAuth />}>
                 <Route element={<AppShell />}>
-                  <Route path="/" element={<RoleLanding />} />
                   <Route path="/profile" element={<EmployeeProfile self />} />
                   <Route path="/attendance" element={<AttendancePage />} />
                   <Route path="/time-off" element={<TimeOffPage />} />
