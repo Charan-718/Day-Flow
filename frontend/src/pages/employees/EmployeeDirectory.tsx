@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { listEmployees, createEmployee, listDepartments } from '../../services/employees';
 import { getDashboardSummary } from '../../services/admin';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../components/Toast';
 import { PresenceIndicator } from '../../components/StatusBadge';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
