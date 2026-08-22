@@ -6,11 +6,33 @@ import { writeAuditLog } from '../../utils/auditWriter';
 import { parseDateOnly, todayUtc } from '../../utils/dates';
 import { z } from 'zod';
 import { listEmployeesQuerySchema, updateEmployeeSchema } from './employees.schema';
+import { syncUserRoleForEmployee } from '../../utils/roleResolver';
 
 type ListQuery = z.infer<typeof listEmployeesQuerySchema>;
 type UpdateInput = z.infer<typeof updateEmployeeSchema>;
 
 const EMPLOYEE_SELF_ALLOWLIST = new Set(['phone', 'address', 'profilePictureUrl']);
+
+function isWeekend(date: Date): boolean {
+  const d = date.getUTCDay();
+  return d === 0 || d === 6;
+}
+
+function derivePresence(
+  summary: {
+    status: string;
+    checkIn: Date | null;
+    checkOut: Date | null;
+  } | undefined,
+  onLeaveToday: boolean,
+  date: Date
+): 'present' | 'on_leave' | 'absent' {
+  if (onLeaveToday || summary?.status === 'LEAVE') return 'on_leave';
+  if (summary?.checkIn && !summary?.checkOut) return 'present';
+  if (summary?.status === 'PRESENT' || summary?.status === 'HALF_DAY') return 'present';
+  if (isWeekend(date)) return 'absent';
+  return 'absent';
+}
 
 function toPublicDirectory(employee: {
   id: string;
@@ -63,31 +85,53 @@ export async function listEmployees(query: ListQuery) {
   ]);
 
   const today = todayUtc();
-  const summaries = await prisma.attendanceDaySummary.findMany({
-    where: {
-      date: today,
-      employeeId: { in: rows.map((r) => r.id) },
-    },
-  });
+  const employeeIds = rows.map((r) => r.id);
+
+  const [summaries, leaveToday] = await Promise.all([
+    prisma.attendanceDaySummary.findMany({
+      where: { date: today, employeeId: { in: employeeIds } },
+    }),
+    prisma.leaveRequest.findMany({
+      where: {
+        employeeId: { in: employeeIds },
+        status: 'APPROVED',
+        startDate: { lte: today },
+        endDate: { gte: today },
+      },
+      select: { employeeId: true },
+    }),
+  ]);
+
   const summaryMap = new Map(summaries.map((s) => [s.employeeId, s]));
+  const leaveSet = new Set(leaveToday.map((l) => l.employeeId));
 
   return {
-    items: rows.map((e) => ({
-      ...toPublicDirectory(e),
-      loginId: e.user.loginId,
-      email: e.user.email,
-      role: e.user.role,
-      todayAttendance: summaryMap.get(e.id)
-        ? {
-            status: summaryMap.get(e.id)!.status,
-            checkIn: summaryMap.get(e.id)!.checkIn,
-            checkOut: summaryMap.get(e.id)!.checkOut,
-            isCheckedIn: Boolean(
-              summaryMap.get(e.id)!.checkIn && !summaryMap.get(e.id)!.checkOut
-            ),
-          }
-        : { status: null, checkIn: null, checkOut: null, isCheckedIn: false },
-    })),
+    items: rows.map((e) => {
+      const summary = summaryMap.get(e.id);
+      const presence = derivePresence(summary, leaveSet.has(e.id), today);
+      return {
+        ...toPublicDirectory(e),
+        loginId: e.user.loginId,
+        email: e.user.email,
+        role: e.user.role,
+        presence,
+        todayAttendance: summary
+          ? {
+              status: summary.status,
+              checkIn: summary.checkIn,
+              checkOut: summary.checkOut,
+              isCheckedIn: Boolean(summary.checkIn && !summary.checkOut),
+              presence,
+            }
+          : {
+              status: null,
+              checkIn: null,
+              checkOut: null,
+              isCheckedIn: false,
+              presence,
+            },
+      };
+    }),
     pagination: {
       page: query.page,
       pageSize: query.pageSize,
@@ -129,6 +173,8 @@ export async function getEmployeeById(id: string, actor: AuthUser) {
     };
   }
 
+  const company = await prisma.company.findFirst({ orderBy: { createdAt: 'asc' } });
+
   const base = {
     id: employee.id,
     firstName: employee.firstName,
@@ -152,6 +198,8 @@ export async function getEmployeeById(id: string, actor: AuthUser) {
     skills: employee.skills,
     certifications: employee.certifications,
     documents: employee.documents,
+    companyName: company?.name ?? 'Dayflow',
+    location: employee.address,
     leaveBalances: employee.leaveBalances.map((b) => ({
       leaveType: b.leaveType,
       allocatedDays: Number(b.allocatedDays),
@@ -268,6 +316,14 @@ export async function updateEmployee(
       },
     });
 
+    if (isAdmin && (input.departmentId !== undefined || input.designation !== undefined)) {
+      await syncUserRoleForEmployee(
+        id,
+        emp.departmentId,
+        emp.designation
+      );
+    }
+
     await writeAuditLog(tx, {
       actorId: actor.userId,
       action: 'EMPLOYEE_UPDATED',
@@ -377,4 +433,48 @@ export async function getEmployee360(id: string) {
 
 export async function listDepartments() {
   return prisma.department.findMany({ orderBy: { name: 'asc' } });
+}
+
+export async function addEmployeeDocument(
+  employeeId: string,
+  input: { label: string; fileName: string; dataBase64: string },
+  actor: AuthUser,
+  ipAddress?: string
+) {
+  const isAdmin = actor.role === Role.HR_ADMIN;
+  const isSelf = actor.employeeId === employeeId;
+  if (!isAdmin && !isSelf) {
+    throw new AppError('You cannot upload documents for this employee', 'FORBIDDEN', 403);
+  }
+
+  assertFound(await prisma.employee.findUnique({ where: { id: employeeId } }), 'Employee not found');
+
+  const { saveBase64File } = await import('../../utils/fileStore');
+  const stored = saveBase64File(input.fileName, input.dataBase64);
+  const fileUrl = `/api/files/${stored}`;
+
+  return prisma.$transaction(async (tx) => {
+    const doc = await tx.employeeDocument.create({
+      data: {
+        employeeId,
+        label: input.label,
+        fileUrl,
+      },
+    });
+
+    await writeAuditLog(tx, {
+      actorId: actor.userId,
+      action: 'DOCUMENT_UPLOADED',
+      entityType: 'EmployeeDocument',
+      entityId: doc.id,
+      newValue: { label: input.label, fileUrl },
+      ipAddress,
+    });
+
+    return doc;
+  });
+}
+
+export async function getCompanyInfo() {
+  return prisma.company.findFirst({ orderBy: { createdAt: 'asc' } });
 }

@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { listEmployees, createEmployee, listDepartments } from '../../services/employees';
 import { getDashboardSummary } from '../../services/admin';
 import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../components/Toast';
-import { PresenceDot, derivePresenceState } from '../../components/StatusBadge';
+import { PresenceIndicator } from '../../components/StatusBadge';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { SearchIcon, UserPlusIcon } from '../../components/icons';
@@ -30,6 +29,7 @@ export function EmployeeDirectory() {
   const [createdCreds, setCreatedCreds] = useState<{
     loginId: string;
     temporaryPassword: string;
+    assignedRole?: string;
   } | null>(null);
   const qc = useQueryClient();
 
@@ -55,19 +55,28 @@ export function EmployeeDirectory() {
     enabled: open,
   });
 
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    designation: '',
+    departmentId: '',
+    joiningDate: new Date().toISOString().slice(0, 10),
+    monthlyWage: '',
+  });
 
   const create = useMutation({
     mutationFn: () =>
       createEmployee({
         ...form,
         departmentId: form.departmentId || null,
-        role: 'EMPLOYEE',
+        monthlyWage: form.monthlyWage ? Number(form.monthlyWage) : undefined,
       }),
     onSuccess: (res) => {
       setCreatedCreds({
         loginId: res.loginId,
         temporaryPassword: res.temporaryPassword,
+        assignedRole: (res as { assignedRole?: string }).assignedRole,
       });
       showToast('success', `Employee created — Login ID ${res.loginId}`);
       void qc.invalidateQueries({ queryKey: ['employees'] });
@@ -132,39 +141,40 @@ export function EmployeeDirectory() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {data?.items.map((emp) => {
-          const presence = derivePresenceState(emp.todayAttendance);
-          return (
-            <Link
-              key={emp.id}
-              to={`/employees/${emp.id}`}
-              className="group relative rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)] transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[var(--shadow-md)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
-            >
-              <span className="absolute right-3 top-3">
-                <PresenceDot state={presence} />
-              </span>
-              <div className="flex items-center gap-3">
+        {data?.items.map((emp) => (
+          <Link
+            key={emp.id}
+            to={`/employees/${emp.id}`}
+            className="group relative rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)] transition hover:border-[var(--accent)]"
+          >
+            <span className="absolute right-3 top-3">
+              <PresenceIndicator
+                presence={emp.presence || emp.todayAttendance.presence || 'absent'}
+              />
+            </span>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">
                 {emp.profilePictureUrl ? (
                   <img
-                    src={emp.profilePictureUrl}
+                    src={String(emp.profilePictureUrl)}
                     alt=""
-                    className="h-12 w-12 shrink-0 rounded-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-sm font-semibold text-[var(--accent)]">
+                  <>
                     {emp.firstName[0]}
                     {emp.lastName[0]}
-                  </div>
+                  </>
                 )}
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-[var(--ink)] group-hover:text-[var(--accent)]">
-                    {emp.firstName} {emp.lastName}
-                  </p>
-                  <p className="truncate text-sm text-[var(--muted)]">
-                    {emp.designation || '—'} · {emp.department?.name || 'Unassigned'}
-                  </p>
-                  <p className="font-mono text-xs text-[var(--muted)]">{emp.employeeCode}</p>
-                </div>
+              </div>
+              <div>
+                <p className="font-semibold group-hover:text-[var(--accent)]">
+                  {emp.firstName} {emp.lastName}
+                </p>
+                <p className="text-sm text-[var(--muted)]">
+                  {emp.designation || '—'} · {emp.department?.name || 'Unassigned'}
+                </p>
+                <p className="font-mono text-xs text-[var(--muted)]">{emp.employeeCode}</p>
               </div>
             </Link>
           );
@@ -194,11 +204,16 @@ export function EmployeeDirectory() {
       >
         {createdCreds ? (
           <div className="space-y-3 text-sm">
-            <p className="text-[var(--ink)]">Share these credentials with the new hire:</p>
-            <div className="rounded-md bg-[var(--bg)] p-3 font-mono">
+            <p>Share these credentials with the new hire:</p>
+            <div className="rounded-md bg-[var(--bg)] p-3 font-mono text-xs">
               <p>Login ID: {createdCreds.loginId}</p>
+              <p>Role: {createdCreds.assignedRole || 'EMPLOYEE'}</p>
               <p>Temp password: {createdCreds.temporaryPassword}</p>
             </div>
+            <p className="text-xs text-[var(--muted)]">
+              HR department or HR job title automatically receives HR Admin access.
+            </p>
+            <Button onClick={() => setOpen(false)}>Done</Button>
           </div>
         ) : (
           <form
@@ -275,7 +290,52 @@ export function EmployeeDirectory() {
                 value={form.joiningDate}
                 onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
               />
-            </label>
+            </div>
+            <input
+              required
+              type="email"
+              placeholder="Work email"
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <input
+              placeholder="Job position"
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.designation}
+              onChange={(e) => setForm({ ...form, designation: e.target.value })}
+            />
+            <select
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.departmentId}
+              onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
+            >
+              <option value="">Department</option>
+              {departments.data?.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={0}
+              placeholder="Monthly wage (₹) — optional"
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.monthlyWage}
+              onChange={(e) => setForm({ ...form, monthlyWage: e.target.value })}
+            />
+            <p className="text-xs text-[var(--muted)]">
+              Role is assigned automatically: Human Resources → HR Admin, all other departments →
+              Employee.
+            </p>
+            <input
+              type="date"
+              required
+              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
+              value={form.joiningDate}
+              onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
+            />
             {create.isError && (
               <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
                 {getApiError(create.error).message}

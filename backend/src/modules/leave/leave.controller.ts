@@ -10,6 +10,14 @@ export async function types(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function holidays(_req: Request, res: Response, next: NextFunction) {
+  try {
+    return sendSuccess(res, await service.listPublicHolidays(), 'OK');
+  } catch (err) {
+    return next(err);
+  }
+}
+
 export async function balance(req: Request, res: Response, next: NextFunction) {
   try {
     return sendSuccess(res, await service.getMyBalances(req.user!), 'OK');

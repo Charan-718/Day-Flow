@@ -10,6 +10,8 @@ import {
   todayUtc,
 } from '../../utils/dates';
 import { env } from '../../config/env';
+import { computePayableDays } from '../../utils/payableDays';
+import { notifyHrAdmins } from '../../utils/notifyHr';
 
 function dayBounds(day: Date) {
   const start = startOfDay(day);
@@ -161,10 +163,13 @@ export async function checkOut(actor: AuthUser, ipAddress?: string) {
       },
     });
 
-    const workedMinutes = Math.max(
+    const rawWorked = Math.max(
       0,
       Math.round((now.getTime() - openCheckIn.occurredAt.getTime()) / 60000)
     );
+    const salary = await tx.salaryStructure.findUnique({ where: { employeeId } });
+    const breakMins = salary?.breakTimeMinutes ?? 60;
+    const workedMinutes = Math.max(0, rawWorked - breakMins);
     const late = isLateCheckIn(openCheckIn.occurredAt);
 
     const summary = await tx.attendanceDaySummary.upsert({
@@ -230,6 +235,7 @@ export async function getMyAttendance(
   const totalWorkingDays = countWeekdays(start, end);
 
   const todayStatus = await getTodayStatus(actor.employeeId);
+  const payslipPreview = await computePayableDays(actor.employeeId, m + 1, y);
 
   return {
     month: m + 1,
@@ -239,6 +245,9 @@ export async function getMyAttendance(
       totalWorkingDays,
       leaveCount,
       exceptionCount: days.filter((d) => d.isException).length,
+      payableDays: payslipPreview.payableDays,
+      absentDays: payslipPreview.absentDays,
+      unpaidLeaveDays: payslipPreview.unpaidLeaveDays,
     },
     days: days.map((d) => ({
       ...d,
@@ -371,14 +380,26 @@ export async function flagMissingCheckouts() {
       checkOut: null,
       isException: false,
     },
+    include: {
+      employee: { select: { firstName: true, lastName: true } },
+    },
   });
 
-  for (const row of stale) {
-    await prisma.attendanceDaySummary.update({
-      where: { id: row.id },
-      data: { isException: true },
-    });
-  }
+  if (stale.length === 0) return { flagged: 0 };
+
+  await prisma.$transaction(async (tx) => {
+    for (const row of stale) {
+      await tx.attendanceDaySummary.update({
+        where: { id: row.id },
+        data: { isException: true },
+      });
+      await notifyHrAdmins(
+        tx,
+        'ATTENDANCE_EXCEPTION',
+        `Missing checkout: ${row.employee.firstName} ${row.employee.lastName} on ${row.date.toISOString().slice(0, 10)}`
+      );
+    }
+  });
 
   return { flagged: stale.length };
 }

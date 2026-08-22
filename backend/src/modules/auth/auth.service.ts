@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
-import { AccountStatus, Prisma, Role } from '@prisma/client';
+import crypto from 'crypto';
+import { AccountStatus, ComponentBasis, Prisma, Role } from '@prisma/client';
 import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
 import { AppError } from '../../utils/errors';
@@ -7,12 +8,24 @@ import { signToken } from '../../utils/jwt';
 import { generateEmployeeCode, generateLoginId } from '../../utils/loginIdGenerator';
 import { parseDateOnly } from '../../utils/dates';
 import { writeAuditLog } from '../../utils/auditWriter';
+import { resolveEmployeeRole } from '../../utils/roleResolver';
+import { calculateSalaryComponents } from '../../utils/salaryCalculator';
 import { z } from 'zod';
-import { createEmployeeSchema, loginSchema, verifyEmailSchema } from './auth.schema';
+import {
+  changePasswordSchema,
+  createEmployeeSchema,
+  loginSchema,
+  verifyEmailSchema,
+} from './auth.schema';
 
 type LoginInput = z.infer<typeof loginSchema>;
 type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+function generateTempPassword(): string {
+  return crypto.randomBytes(16).toString('base64url').slice(0, 16);
+}
 
 async function ensureDefaultLeaveBalances(tx: Prisma.TransactionClient, employeeId: string) {
   const types = await tx.leaveType.findMany();
@@ -27,6 +40,31 @@ async function ensureDefaultLeaveBalances(tx: Prisma.TransactionClient, employee
       },
     });
   }
+}
+
+async function createSalaryStructure(
+  tx: Prisma.TransactionClient,
+  employeeId: string,
+  monthlyWage: number
+) {
+  const calc = calculateSalaryComponents(monthlyWage);
+  await tx.salaryStructure.create({
+    data: {
+      employeeId,
+      monthlyWage: calc.monthlyWage,
+      yearlyWage: calc.yearlyWage,
+      workingDaysPerWeek: 5,
+      breakTimeMinutes: 60,
+      components: {
+        create: calc.components.map((c) => ({
+          name: c.name,
+          basis: c.basis as ComponentBasis,
+          percentage: c.percentage,
+          amount: c.amount,
+        })),
+      },
+    },
+  });
 }
 
 export async function login(input: LoginInput) {
@@ -51,14 +89,10 @@ export async function login(input: LoginInput) {
     throw new AppError('Invalid credentials', 'INVALID_CREDENTIALS', 401);
   }
 
-  // First successful login activates PENDING_ACTIVATION accounts
-  if (user.status === AccountStatus.PENDING_ACTIVATION) {
+  if (user.status === AccountStatus.PENDING_ACTIVATION && !user.mustChangePassword) {
     await prisma.user.update({
       where: { id: user.id },
-      data: {
-        status: AccountStatus.ACTIVE,
-        emailVerifiedAt: new Date(),
-      },
+      data: { status: AccountStatus.ACTIVE, emailVerifiedAt: new Date() },
     });
   }
 
@@ -78,15 +112,63 @@ export async function login(input: LoginInput) {
       employeeId: user.employee?.id ?? null,
       firstName: user.employee?.firstName ?? null,
       lastName: user.employee?.lastName ?? null,
+      mustChangePassword: user.mustChangePassword,
     },
   };
+}
+
+export async function changePassword(
+  userId: string,
+  input: ChangePasswordInput,
+  ipAddress?: string
+) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError('User not found', 'NOT_FOUND', 404);
+
+  const valid = await bcrypt.compare(input.currentPassword, user.passwordHash);
+  if (!valid) {
+    throw new AppError('Current password is incorrect', 'INVALID_CREDENTIALS', 401);
+  }
+
+  if (input.currentPassword === input.newPassword) {
+    throw new AppError('New password must differ from current password', 'VALIDATION_ERROR', 400);
+  }
+
+  const passwordHash = await bcrypt.hash(input.newPassword, env.BCRYPT_ROUNDS);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        mustChangePassword: false,
+        status: AccountStatus.ACTIVE,
+        emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
+      },
+    });
+
+    await writeAuditLog(tx, {
+      actorId: userId,
+      action: 'PASSWORD_CHANGED',
+      entityType: 'User',
+      entityId: userId,
+      ipAddress,
+    });
+  });
+
+  return { ok: true };
 }
 
 export async function createEmployee(
   input: CreateEmployeeInput,
   actorId: string,
+  actorRole: Role,
   ipAddress?: string
 ) {
+  if (actorRole !== Role.HR_ADMIN) {
+    throw new AppError('Only HR Admin can provision employees', 'FORBIDDEN', 403);
+  }
+
   const email = input.email.trim().toLowerCase();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -94,9 +176,16 @@ export async function createEmployee(
   }
 
   const joiningDate = parseDateOnly(input.joiningDate);
+  const role = await resolveEmployeeRole({
+    departmentId: input.departmentId,
+    designation: input.designation,
+    requestedRole: input.role as Role | undefined,
+    actorRole,
+  });
+
   const loginId = await generateLoginId(input.firstName, input.lastName, joiningDate);
   const employeeCode = await generateEmployeeCode(joiningDate);
-  const tempPassword = input.temporaryPassword || `Welcome@${joiningDate.getFullYear()}`;
+  const tempPassword = input.temporaryPassword || generateTempPassword();
   const passwordHash = await bcrypt.hash(tempPassword, env.BCRYPT_ROUNDS);
 
   const result = await prisma.$transaction(async (tx) => {
@@ -105,8 +194,9 @@ export async function createEmployee(
         loginId,
         email,
         passwordHash,
-        role: input.role as Role,
+        role,
         status: AccountStatus.PENDING_ACTIVATION,
+        mustChangePassword: true,
       },
     });
 
@@ -141,26 +231,26 @@ export async function createEmployee(
 
     await ensureDefaultLeaveBalances(tx, employee.id);
 
+    if (input.monthlyWage) {
+      await createSalaryStructure(tx, employee.id, input.monthlyWage);
+    }
+
     await writeAuditLog(tx, {
       actorId,
       action: 'EMPLOYEE_CREATED',
       entityType: 'Employee',
       entityId: employee.id,
-      newValue: {
-        loginId,
-        email,
-        employeeCode,
-        role: input.role,
-      },
+      newValue: { loginId, email, employeeCode, role },
       ipAddress,
     });
 
-    return { user, employee, temporaryPassword: tempPassword };
+    return { user, employee, temporaryPassword: tempPassword, assignedRole: role };
   });
 
   return {
     loginId: result.user.loginId,
     temporaryPassword: result.temporaryPassword,
+    assignedRole: result.assignedRole,
     employee: result.employee,
   };
 }
@@ -205,13 +295,17 @@ export async function getMe(userId: string) {
     throw new AppError('User not found', 'NOT_FOUND', 404);
   }
 
+  const company = await prisma.company.findFirst({ orderBy: { createdAt: 'asc' } });
+
   return {
     id: user.id,
     loginId: user.loginId,
     email: user.email,
     role: user.role,
     status: user.status,
+    mustChangePassword: user.mustChangePassword,
     employeeId: user.employee?.id ?? null,
+    company: company ? { name: company.name, code: company.code } : null,
     employee: user.employee
       ? {
           id: user.employee.id,

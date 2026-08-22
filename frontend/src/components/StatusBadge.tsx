@@ -34,8 +34,30 @@ export function StatusBadge({ status, label }: { status: string; label?: string 
   );
 }
 
-/** Binary checked-in/out indicator for the nav check-in widget — that control's own
- *  state genuinely is binary, unlike a directory card's daily status (see PresenceDot). */
+export function PresenceIndicator({ presence }: { presence: 'present' | 'on_leave' | 'absent' }) {
+  if (presence === 'on_leave') {
+    return (
+      <span title="On leave" className="text-sm" aria-label="On leave">
+        ✈️
+      </span>
+    );
+  }
+  if (presence === 'present') {
+    return (
+      <span
+        title="Present"
+        className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--success)]"
+      />
+    );
+  }
+  return (
+    <span
+      title="Absent"
+      className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--warning)]"
+    />
+  );
+}
+
 export function AttendanceDot({ checkedIn }: { checkedIn: boolean }) {
   return (
     <span

@@ -1,8 +1,12 @@
 node_modules
 dist
 .env
+.env.local
+.env.*.local
+!.env.example
 *.log
 .git
 .DS_Store
 frontend/dist
 backend/dist
+uploads

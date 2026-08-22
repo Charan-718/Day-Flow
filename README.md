@@ -1,84 +1,61 @@
-# Dayflow — Human Resource Management System
+# Dayflow — Production HRMS
 
-Modular monolith HRMS with JWT RBAC, PostgreSQL, Docker, and an Odoo-inspired React UI.
-
-## Stack
-
-| Layer | Tech |
-|---|---|
-| Frontend | React 19 + TypeScript + Vite + Tailwind v4 + React Query + React Router |
-| Backend | Node.js + Express + TypeScript + Prisma + Zod + bcrypt + JWT |
-| Database | PostgreSQL 16 |
-| Ops | Docker Compose |
-
-## Quick start (Docker)
+## Quick start (Docker — no .env required)
 
 ```bash
 docker compose up --build
 ```
 
-- App UI: http://localhost:5173  
-- API: http://localhost:4000/health  
-- Postgres (host): `localhost:5433` → container `5432`
+| Service | URL |
+|---|---|
+| UI | http://localhost:5173 |
+| API | http://localhost:4000/health |
 
-On first boot the backend runs `prisma migrate deploy` and seeds demo data.
+**Demo logins** (seeded automatically on first run):
 
-## Local development
+| Role | Email | Password |
+|------|-------|----------|
+| HR Admin | `priya@demo.local` | `Password@123` |
+| Employee | `rahul@demo.local` | `Password@123` |
 
-### 1. Database
+Fresh database with no demo users? Bootstrap HR is also created when the DB is empty:
+
+- Email: `hr.admin@dayflow.local`
+- Password: `ChangeMeOnFirstLogin!` (must change on first login)
+
+## Optional: override with `.env`
+
+Defaults are baked into `docker-compose.yml` for local Docker. To customize, copy:
+
+```bash
+cp .env.example .env
+# edit JWT_SECRET, POSTGRES_PASSWORD, etc.
+docker compose up --build
+```
+
+**Never commit `.env`** to git.
+
+## Local development (hot reload)
+
+Requires **Node 20+** (`nvm use 20`).
 
 ```bash
 docker compose up -d db
+
+cd backend && cp .env.example .env && npm install
+npx prisma migrate dev && npm run prisma:seed && npm run dev
+
+cd frontend && npm install && npm run dev
 ```
 
-### 2. Backend
+## How access works
 
-```bash
-cd backend
-cp .env.example .env   # already points at localhost:5433
-npm install
-npx prisma migrate dev
-npm run prisma:seed
-npm run dev
-```
+1. **No public sign-up** — only HR Admin can provision accounts.
+2. **Role assignment:** Human Resources department or HR job title → `HR_ADMIN`; all others → `EMPLOYEE`.
+3. **Production:** set `SEED_DEMO_DATA=false` and use strong secrets in `.env`.
 
-### 3. Frontend
+## Wireframe features
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open http://localhost:5173
-
-## Demo accounts
-
-Password for all: `Password@123`
-
-| Role | Email | Login ID |
-|---|---|---|
-| HR Admin | `priya@dayflow.local` | `PS2026001` |
-| Employee | `rahul@dayflow.local` | `RV2026002` |
-
-## RBAC highlights
-
-- No public signup — HR Admin provisions employees (`POST /api/auth/employees`) with auto Login ID (`AS2026007` pattern).
-- Middleware: `requireAuth` → `requireRole` / `requireSelfOrAdmin`.
-- Salary endpoint re-checks ownership in the **service layer** (defense in depth). Employee A calling `/api/employees/{B}/salary` returns **403** with no salary payload.
-- Leave approve/reject + attendance check-in are **Prisma transactions** (status + balance/notification + audit commit together).
-
-## Project layout
-
-```
-backend/src/modules/{auth,employees,attendance,leave,payroll,notifications,dashboard,audit}/
-frontend/src/{pages,components,services,routes,hooks}/
-files/   # PRD / TRD / build prompts
-```
-
-## API envelope
-
-```json
-{ "success": true, "message": "…", "data": {} }
-{ "success": false, "message": "…", "code": "LEAVE_OVERLAP" }
-```
+- HR-provisioned accounts, login ID generation, employee status dots
+- Check-in/out, role-aware attendance, leave calendar with holidays
+- Salary tab (HR only), Security tab, forced password change on first login

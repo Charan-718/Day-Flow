@@ -51,3 +51,17 @@ export async function departments(_req: Request, res: Response, next: NextFuncti
     return next(err);
   }
 }
+
+export async function addDocument(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await service.addEmployeeDocument(
+      req.params.id,
+      req.body,
+      req.user!,
+      req.clientIp
+    );
+    return sendSuccess(res, data, 'Document uploaded', 201);
+  } catch (err) {
+    return next(err);
+  }
+}

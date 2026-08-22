@@ -6,6 +6,13 @@ export async function getLeaveTypes() {
   return data.data;
 }
 
+export async function getPublicHolidays(year?: number) {
+  const { data } = await api.get<
+    ApiSuccess<Array<{ id: string; name: string; date: string }>>
+  >('/leave/holidays', { params: year ? { year } : undefined });
+  return data.data;
+}
+
 export async function getLeaveBalance() {
   const { data } = await api.get('/leave/balance');
   return data.data as Array<{

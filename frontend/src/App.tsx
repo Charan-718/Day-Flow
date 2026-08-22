@@ -5,6 +5,7 @@ import { ToastProvider } from './components/Toast';
 import { AppShell, AuthLayout } from './layouts/AppShell';
 import { RequireAuth, RequireRole, RoleLanding } from './routes/guards';
 import { LoginPage } from './pages/auth/Login';
+import { ChangePasswordPage } from './pages/auth/ChangePassword';
 import { EmployeeDirectory } from './pages/employees/EmployeeDirectory';
 import { EmployeeProfile } from './pages/employees/EmployeeProfile';
 import { Employee360Page } from './pages/employees/Employee360';
@@ -22,13 +23,13 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ToastProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<LoginPage />} />
-              </Route>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/change-password" element={<ChangePasswordPage />} />
+            </Route>
 
               <Route element={<RequireAuth />}>
                 <Route element={<AppShell />}>

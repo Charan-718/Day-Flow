@@ -1,18 +1,26 @@
 import { prisma } from '../config/prisma';
+import { env } from '../config/env';
+
+function employeeInitials(firstName: string, lastName: string): string {
+  const f = firstName.trim().slice(0, 2).toUpperCase().padEnd(2, 'X');
+  const l = lastName.trim().slice(0, 2).toUpperCase().padEnd(2, 'X');
+  return `${f}${l}`;
+}
 
 /**
- * Login ID format: [Initials][YearOfJoining][SerialNumber]
- * Example: Aditi Sharma, 7th hire in 2026 → AS2026007
+ * Wireframe format: [CompanyCode][EmployeeInitials][Year][Serial]
+ * Example: DF + JODO + 2026 + 0001 → DFJODO20260001
  */
 export async function generateLoginId(
   firstName: string,
   lastName: string,
   joiningDate: Date
 ): Promise<string> {
-  const initials =
-    (firstName.trim().charAt(0) + lastName.trim().charAt(0)).toUpperCase() || 'XX';
+  const company = await prisma.company.findFirst({ orderBy: { createdAt: 'asc' } });
+  const companyCode = (company?.code ?? env.COMPANY_CODE).toUpperCase().slice(0, 4);
+  const empInitials = employeeInitials(firstName, lastName);
   const year = joiningDate.getFullYear().toString();
-  const prefix = `${initials}${year}`;
+  const prefix = `${companyCode}${empInitials}${year}`;
 
   const existing = await prisma.user.findMany({
     where: { loginId: { startsWith: prefix } },
@@ -26,7 +34,7 @@ export async function generateLoginId(
     if (!Number.isNaN(seq) && seq > maxSeq) maxSeq = seq;
   }
 
-  const next = (maxSeq + 1).toString().padStart(3, '0');
+  const next = (maxSeq + 1).toString().padStart(4, '0');
   return `${prefix}${next}`;
 }
 

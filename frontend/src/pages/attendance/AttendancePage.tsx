@@ -118,6 +118,7 @@ function MyAttendance() {
               { label: 'Days present', value: data.summary.presentDays },
               { label: workingDaysStat.label, value: workingDaysStat.value },
               { label: 'Leave days', value: data.summary.leaveCount },
+              { label: 'Payable days', value: data.summary.payableDays ?? '—' },
             ]}
           />
 

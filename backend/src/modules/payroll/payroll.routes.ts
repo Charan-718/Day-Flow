@@ -9,12 +9,14 @@ const router = Router({ mergeParams: true });
 
 router.use(requireAuth);
 
-router.get('/:id/salary', requireSelfOrAdmin('id'), controller.get);
+router.get('/:id/salary', requireRole(Role.HR_ADMIN), controller.get);
+router.get('/:id/payslip-preview', requireSelfOrAdmin('id'), controller.payslipPreview);
 router.put(
   '/:id/salary',
   requireRole(Role.HR_ADMIN),
   validate(upsertSalarySchema),
   controller.upsert
 );
+router.put('/:id/salary/from-wage', requireRole(Role.HR_ADMIN), controller.upsertFromWage);
 
 export default router;

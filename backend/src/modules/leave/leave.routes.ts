@@ -19,6 +19,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/types', controller.types);
+router.get('/holidays', controller.holidays);
 router.get('/balance', requireEmployeeProfile(), controller.balance);
 router.get('/requests', validate(listLeaveQuerySchema, 'query'), controller.list);
 router.post(

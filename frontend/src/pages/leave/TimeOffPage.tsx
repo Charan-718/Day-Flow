@@ -5,6 +5,7 @@ import {
   createLeaveRequest,
   getLeaveBalance,
   getLeaveTypes,
+  getPublicHolidays,
   listLeaveRequests,
   rejectLeave,
 } from '../../services/leave';
@@ -13,8 +14,15 @@ import { useToast } from '../../components/Toast';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { StatusBadge } from '../../components/StatusBadge';
-import { EmptyState, ErrorState, PageHeader, StatStrip } from '../../components/ui';
-import { CheckCircleIcon, InboxIcon, SearchOffIcon } from '../../components/icons';
+import { LeaveCalendar } from '../../components/LeaveCalendar';
+import {
+  EmptyState,
+  ErrorState,
+  LoadingSkeleton,
+  PageHeader,
+  StatStrip,
+} from '../../components/ui';
+import { uploadFile } from '../../services/files';
 import { getApiError } from '../../api/client';
 import { LeaveReviewDrawer, formatDate } from './LeaveReviewDrawer';
 import type { LeaveRequest } from '../../types';
@@ -64,6 +72,12 @@ export function TimeOffPage() {
   const requests = useQuery({
     queryKey: ['leave-requests', statusFilter],
     queryFn: () => listLeaveRequests(statusFilter === 'ALL' ? undefined : { status: statusFilter }),
+  });
+  const calendarYear = new Date().getFullYear();
+  const holidays = useQuery({
+    queryKey: ['public-holidays', calendarYear],
+    queryFn: () => getPublicHolidays(calendarYear),
+    enabled: !isAdmin,
   });
 
   // Cheap counts for the filter tabs — uses the pagination envelope the API already
@@ -197,40 +211,21 @@ export function TimeOffPage() {
         />
       )}
 
-      <div role="group" aria-label="Filter by status" className="mb-4 flex flex-wrap gap-1.5">
-        {STATUS_TABS.map((tab, i) => {
-          const count = countQueries[i]?.data;
-          const isActive = statusFilter === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              // aria-current, not aria-pressed — these are mutually exclusive filter
-              // options (one "current" selection), not independent toggle buttons.
-              aria-current={isActive ? 'true' : undefined}
-              onClick={() => setStatusFilter(tab.key)}
-              className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
-                isActive
-                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                  : 'border-[var(--border-control)] bg-white text-[var(--muted)] hover:bg-[var(--bg)]'
-              }`}
-            >
-              {tab.label}
-              {typeof count === 'number' && (
-                <span
-                  className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-mono text-[11px] font-semibold ${
-                    isActive ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg)] text-[var(--muted)]'
-                  }`}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {!isAdmin && requests.data && (
+        <div className="mb-6">
+          {holidays.isLoading ? (
+            <LoadingSkeleton rows={4} />
+          ) : (
+            <LeaveCalendar
+              year={calendarYear}
+              requests={requests.data.items}
+              holidays={holidays.data || []}
+            />
+          )}
+        </div>
+      )}
 
-      {requests.isLoading && <TableSkeleton isAdmin={isAdmin} />}
+      {requests.isLoading && <LoadingSkeleton />}
       {requests.isError && (
         <ErrorState message={getApiError(requests.error).message} onRetry={() => requests.refetch()} />
       )}
@@ -425,18 +420,24 @@ export function TimeOffPage() {
 
           {selectedType?.requiresAttachment && (
             <label className="block text-sm">
-              <span className="mb-1.5 block font-medium text-[var(--ink)]">
-                Attachment URL{' '}
-                <span className="font-normal text-[var(--muted)]">— required for {selectedType.name}</span>
+              <span className="mb-1 block font-medium">
+                Attachment (required for Sick Leave certificate)
               </span>
               <input
-                required
-                type="url"
-                placeholder="https://…"
-                value={form.attachmentUrl}
-                onChange={(e) => setForm({ ...form, attachmentUrl: e.target.value })}
-                className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                type="file"
+                accept=".pdf,image/*"
+                required={!form.attachmentUrl}
+                className="w-full text-sm"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const url = await uploadFile(file);
+                  setForm({ ...form, attachmentUrl: url });
+                }}
               />
+              {form.attachmentUrl && (
+                <span className="mt-1 block text-xs text-[var(--success)]">Uploaded ✓</span>
+              )}
             </label>
           )}
 

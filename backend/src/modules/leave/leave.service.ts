@@ -28,6 +28,10 @@ export async function listLeaveTypes() {
   return prisma.leaveType.findMany({ orderBy: { name: 'asc' } });
 }
 
+export async function listPublicHolidays() {
+  return prisma.publicHoliday.findMany({ orderBy: { date: 'asc' } });
+}
+
 export async function getMyBalances(actor: AuthUser) {
   if (!actor.employeeId) {
     throw new AppError('Employee profile required', 'FORBIDDEN', 403);
