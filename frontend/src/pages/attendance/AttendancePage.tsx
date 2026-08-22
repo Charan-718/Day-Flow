@@ -79,29 +79,29 @@ function MyAttendance() {
     : { label: 'Working days', value: data?.summary.totalWorkingDays ?? 0 };
 
   return (
-    <div className="w-full space-y-6 pb-12">
+    <div className="w-full space-y-8 pb-12">
       {/* 1. Attendance Header with Integrated Month Navigation */}
       <PageHeader
         title="Attendance"
         subtitle="Your monthly presence record"
         actions={
-          <div className="flex items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-1.5 shadow-md">
+          <div className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2 shadow-md">
             <button
               type="button"
               aria-label="Previous month"
               onClick={() => shift(-1)}
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
             >
               <ArrowLeftIcon size={16} />
             </button>
-            <span className="min-w-[130px] text-center text-sm font-black text-[var(--color-powder-blue)]">
+            <span className="min-w-[140px] text-center text-base font-black text-[var(--color-powder-blue)]">
               {new Date(year, month - 1, 1).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}
             </span>
             <button
               type="button"
               aria-label="Next month"
               onClick={() => shift(1)}
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none"
             >
               <ArrowRightIcon size={16} />
             </button>
@@ -114,47 +114,55 @@ function MyAttendance() {
 
       {data && (
         <>
-          {/* 2. Statistics Section (Full-Width 4-Column Grid on Desktop) */}
-          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl transition hover:border-[var(--color-powder-blue)]/50">
-              <p className="text-[var(--font-size-xs)] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
-                Days Present
-              </p>
-              <p className="mt-2 text-[var(--font-size-md)] font-black tabular-nums text-[var(--color-powder-blue)]">
-                {data.summary.presentDays}
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl transition hover:border-[var(--color-powder-blue)]/50">
-              <p className="text-[var(--font-size-xs)] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
-                {workingDaysStat.label}
-              </p>
-              <p className="mt-2 text-[var(--font-size-md)] font-black tabular-nums text-[var(--color-powder-blue)]">
-                {workingDaysStat.value}
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl transition hover:border-[var(--color-powder-blue)]/50">
-              <p className="text-[var(--font-size-xs)] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
-                Leave Days
-              </p>
-              <p className="mt-2 text-[var(--font-size-md)] font-black tabular-nums text-[var(--color-powder-blue)]">
-                {data.summary.leaveCount}
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl transition hover:border-[var(--color-powder-blue)]/50">
-              <p className="text-[var(--font-size-xs)] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
-                Payable Days
-              </p>
-              <p className="mt-2 text-[var(--font-size-md)] font-black tabular-nums text-[var(--color-powder-blue)]">
-                {data.summary.payableDays ?? '—'}
-              </p>
-            </div>
+          {/* 2. Attendance Statistics Section (Equal 4-Column Grid on Desktop) */}
+          <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                label: 'Days Present',
+                value: data.summary.presentDays,
+                subtext: 'This month',
+                accentColor: 'text-[var(--color-powder-blue)]',
+              },
+              {
+                label: workingDaysStat.label,
+                value: workingDaysStat.value,
+                subtext: isCurrentMonth ? 'Period elapsed' : 'Total in month',
+                accentColor: 'text-[var(--color-text-secondary)]',
+              },
+              {
+                label: 'Leave Days',
+                value: data.summary.leaveCount,
+                subtext: 'Approved leaves',
+                accentColor: data.summary.leaveCount > 0 ? 'text-[var(--color-warning)]' : 'text-[var(--color-powder-blue)]',
+              },
+              {
+                label: 'Payable Days',
+                value: data.summary.payableDays ?? '—',
+                subtext: 'Net payable',
+                accentColor: 'text-[var(--color-powder-blue)]',
+              },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="flex h-full min-h-[120px] flex-col justify-between rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-7 shadow-xl transition-all hover:border-[var(--color-powder-blue)]/40 hover:shadow-2xl"
+              >
+                <div>
+                  <p className="text-[var(--font-size-xs)] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
+                    {stat.label}
+                  </p>
+                  <p className={`mt-3 text-[var(--font-size-md)] font-black tabular-nums ${stat.accentColor}`}>
+                    {stat.value}
+                  </p>
+                </div>
+                <p className="mt-3 text-xs font-semibold text-[var(--color-text-muted)]">
+                  {stat.subtext}
+                </p>
+              </div>
+            ))}
           </div>
 
-          {/* 3. Attendance Records Section */}
-          <div className="space-y-4 pt-2">
+          {/* 3. Attendance Records Section Card */}
+          <div className="space-y-4">
             <h2 className="text-[var(--font-size-md)] font-extrabold text-[var(--color-heading)] tracking-tight">
               Attendance Records
             </h2>
@@ -167,44 +175,50 @@ function MyAttendance() {
               />
             ) : (
               <>
-                <div className="hidden overflow-x-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl md:block">
-                  <table className="w-full text-left text-sm">
-                    <caption className="sr-only">Daily attendance for the selected month</caption>
-                    <thead className="border-b border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)]">
-                      <tr>
-                        <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">Date</th>
-                        <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">Check In</th>
-                        <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">Check Out</th>
-                        <th scope="col" className="px-5 py-4 text-right font-bold uppercase text-xs tracking-wider">Work Hours</th>
-                        <th scope="col" className="px-5 py-4 text-right font-bold uppercase text-xs tracking-wider">Extra</th>
-                        <th scope="col" className="px-5 py-4 font-bold uppercase text-xs tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--color-border)]/50">
-                      {data.days.map(
-                        (d: {
-                          id: string;
-                          date: string;
-                          checkIn: string | null;
-                          checkOut: string | null;
-                          workHours: number | null;
-                          extraHours: number;
-                          status: string;
-                        }) => (
-                          <tr key={d.id} className="hover:bg-[var(--color-surface-hover)] transition-colors">
-                            <td className="px-5 py-4 font-semibold text-[var(--color-text)]">{formatDate(d.date)}</td>
-                            <td className="px-5 py-4 font-mono text-xs text-[var(--color-powder-blue)]">{formatTime(d.checkIn)}</td>
-                            <td className="px-5 py-4 font-mono text-xs text-[var(--color-powder-blue)]">{formatTime(d.checkOut)}</td>
-                            <td className="px-5 py-4 text-right font-mono font-semibold text-[var(--color-text)]">{d.workHours ?? '—'}</td>
-                            <td className="px-5 py-4 text-right font-mono font-semibold text-[var(--color-text)]">{d.extraHours || '—'}</td>
-                            <td className="px-5 py-4">
-                              <StatusBadge status={d.status} />
-                            </td>
-                          </tr>
-                        )
-                      )}
-                    </tbody>
-                  </table>
+                <div className="hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-7 shadow-xl md:block">
+                  <div className="overflow-hidden rounded-xl border border-[var(--color-border)]/70 bg-[var(--color-background-deep)]">
+                    <table className="w-full text-left text-sm">
+                      <caption className="sr-only">Daily attendance for the selected month</caption>
+                      <thead className="border-b border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)]">
+                        <tr>
+                          <th scope="col" className="px-6 py-4.5 font-bold uppercase text-xs tracking-wider">Date</th>
+                          <th scope="col" className="px-6 py-4.5 font-bold uppercase text-xs tracking-wider">Check In</th>
+                          <th scope="col" className="px-6 py-4.5 font-bold uppercase text-xs tracking-wider">Check Out</th>
+                          <th scope="col" className="px-6 py-4.5 text-right font-bold uppercase text-xs tracking-wider">Work Hours</th>
+                          <th scope="col" className="px-6 py-4.5 text-right font-bold uppercase text-xs tracking-wider">Extra</th>
+                          <th scope="col" className="px-6 py-4.5 font-bold uppercase text-xs tracking-wider">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--color-border)]/50 bg-[var(--color-surface)]">
+                        {data.days.map(
+                          (d: {
+                            id: string;
+                            date: string;
+                            checkIn: string | null;
+                            checkOut: string | null;
+                            workHours: number | null;
+                            extraHours: number;
+                            status: string;
+                          }) => (
+                            <tr key={d.id} className="hover:bg-[var(--color-surface-hover)] transition-colors">
+                              <td className="px-6 py-4.5 font-bold text-[var(--color-text)]">{formatDate(d.date)}</td>
+                              <td className="px-6 py-4.5 font-mono text-xs text-[var(--color-powder-blue)]">{formatTime(d.checkIn)}</td>
+                              <td className="px-6 py-4.5 font-mono text-xs text-[var(--color-powder-blue)]">{formatTime(d.checkOut)}</td>
+                              <td className="px-6 py-4.5 text-right font-mono font-bold text-[var(--color-text)]">
+                                {d.workHours != null ? `${d.workHours.toFixed(1)}h` : '—'}
+                              </td>
+                              <td className="px-6 py-4.5 text-right font-mono font-bold text-[var(--color-text-muted)]">
+                                {d.extraHours ? `+${d.extraHours.toFixed(1)}h` : '—'}
+                              </td>
+                              <td className="px-6 py-4.5">
+                                <StatusBadge status={d.status} />
+                              </td>
+                            </tr>
+                          )
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 <div className="space-y-3 md:hidden">
@@ -217,14 +231,14 @@ function MyAttendance() {
                       workHours: number | null;
                       status: string;
                     }) => (
-                      <div key={d.id} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-md">
+                      <div key={d.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-bold text-[var(--color-text)]">{formatDate(d.date)}</p>
                           <StatusBadge status={d.status} />
                         </div>
-                        <p className="mt-1.5 font-mono text-xs text-[var(--color-powder-blue)]">
+                        <p className="mt-2 font-mono text-xs text-[var(--color-powder-blue)]">
                           {formatTime(d.checkIn)} – {formatTime(d.checkOut)}
-                          {d.workHours != null ? ` · ${d.workHours}h` : ''}
+                          {d.workHours != null ? ` · ${d.workHours.toFixed(1)}h` : ''}
                         </p>
                       </div>
                     )
@@ -234,16 +248,16 @@ function MyAttendance() {
             )}
           </div>
 
-          {/* 4. Attendance Timeline Section */}
-          <div className="space-y-4 pt-4">
+          {/* 4. Attendance Timeline Section Card */}
+          <div className="space-y-4">
             <h2 className="text-[var(--font-size-md)] font-extrabold text-[var(--color-heading)] tracking-tight">
               Attendance Timeline
             </h2>
 
             {timeline.isLoading && <TableSkeleton columns={1} rows={4} />}
             {timeline.data?.days?.length ? (
-              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl">
-                <ol className="space-y-4 border-l-2 border-[var(--color-primary)] pl-5">
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 sm:p-7 shadow-xl">
+                <ol className="relative space-y-6 border-l-2 border-[var(--color-primary)]/80 pl-6 ml-2">
                   {timeline.data.days.slice(0, 14).map(
                     (d: {
                       date: string;
@@ -252,16 +266,24 @@ function MyAttendance() {
                       durationMinutes: number | null;
                       status: string;
                     }) => (
-                      <li key={String(d.date)} className="relative text-sm">
-                        <span className="absolute -left-[1.6rem] top-1 h-3 w-3 rounded-full bg-[var(--color-primary)] ring-4 ring-[var(--color-surface)]" />
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className="font-bold text-[var(--color-text)]">{formatDate(d.date)}</span>
-                          <StatusBadge status={d.status} />
+                      <li key={String(d.date)} className="relative">
+                        <span className="absolute -left-[1.95rem] top-1.5 h-3.5 w-3.5 rounded-full bg-[var(--color-primary)] ring-4 ring-[var(--color-surface)] shadow-md" />
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-base font-bold text-[var(--color-text)]">{formatDate(d.date)}</span>
+                            <StatusBadge status={d.status} />
+                          </div>
+                          {d.durationMinutes != null && (
+                            <span className="font-mono text-xs font-bold text-[var(--color-powder-blue)]">
+                              {(d.durationMinutes / 60).toFixed(1)} hours
+                            </span>
+                          )}
                         </div>
-                        <p className="mt-1 font-mono text-xs text-[var(--color-text-secondary)]">
-                          {formatTime(d.checkIn)} → {formatTime(d.checkOut)}
-                          {d.durationMinutes != null ? ` · ${(d.durationMinutes / 60).toFixed(1)}h` : ''}
-                        </p>
+                        <div className="mt-2 flex items-center gap-2 font-mono text-xs font-medium text-[var(--color-text-secondary)]">
+                          <span>{formatTime(d.checkIn)}</span>
+                          <span className="text-[var(--color-primary)]">→</span>
+                          <span>{formatTime(d.checkOut)}</span>
+                        </div>
                       </li>
                     )
                   )}

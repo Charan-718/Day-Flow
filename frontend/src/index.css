@@ -206,13 +206,7 @@
   --border-control: var(--color-border-light);
 }
 
-/* GLOBAL RESETS & BASE STYLES */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
+/* GLOBAL BASE STYLES */
 html {
   scroll-behavior: smooth;
   font-size: 16px;

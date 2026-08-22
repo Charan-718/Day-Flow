@@ -52,10 +52,10 @@ export function CheckInWidget() {
 
   return (
     <div
-      className="flex items-center gap-2.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-3 py-1.5 shadow-sm"
+      className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-deep)] px-4 py-2 shadow-sm"
       title={statusLabel}
     >
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <AttendanceDot checkedIn={isCheckedIn} />
         <span className="hidden font-mono text-xs font-bold text-[var(--color-text-secondary)] sm:inline">
           {isCheckedIn ? formatElapsed(data?.checkIn ?? null) : 'Out'}
@@ -66,7 +66,7 @@ export function CheckInWidget() {
         disabled={mutation.isPending}
         onClick={() => mutation.mutate()}
         aria-label={`${isCheckedIn ? 'Check out' : 'Check in'}. ${statusLabel}.`}
-        className="cursor-pointer rounded-lg bg-[var(--color-primary)] px-3 py-1 text-xs font-black text-white shadow-md transition-all hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none"
+        className="cursor-pointer rounded-xl bg-[var(--color-primary)] px-3.5 py-1.5 text-xs font-black text-white shadow-md transition-all hover:bg-[var(--color-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none"
       >
         {mutation.isPending ? '…' : isCheckedIn ? 'Check Out' : 'Check In'}
       </button>

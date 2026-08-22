@@ -18,14 +18,14 @@ const NAV_ITEMS = [
 ];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `relative flex items-center h-16 px-1 text-sm font-bold transition-colors focus-visible:outline-none ${
+  `relative flex items-center h-[72px] px-1 text-base font-bold transition-colors focus-visible:outline-none ${
     isActive
       ? 'text-[var(--color-powder-blue)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--color-powder-blue)]'
       : 'text-[var(--color-text-secondary)] hover:text-white'
   }`;
 
 const drawerNavLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex h-12 items-center rounded-xl px-3 text-sm font-bold transition-colors ${
+  `flex h-12 items-center rounded-xl px-3 text-base font-bold transition-colors ${
     isActive
       ? 'bg-[var(--color-primary-alpha-12)] text-[var(--color-powder-blue)]'
       : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'
@@ -52,11 +52,11 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-[var(--color-background)]">
-      {/* 64px Fixed Height Full-Width Navbar */}
-      <header className="sticky top-0 z-30 h-16 w-full border-b border-[var(--color-border)] bg-[var(--color-surface)] shadow-md">
-        <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+      {/* 72px Fixed Height Full-Width Navbar with 24-48px Horizontal Padding */}
+      <header className="sticky top-0 z-30 h-[72px] w-full border-b border-[var(--color-border)] bg-[var(--color-surface)] shadow-md">
+        <div className="flex h-full w-full items-center justify-between px-6 sm:px-8 lg:px-12 xl:px-16">
           {/* LEFT: Logo & Brand */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3.5">
             <button
               type="button"
               onClick={() => setMobileNavOpen(true)}
@@ -66,11 +66,11 @@ export function AppShell() {
               <MenuIcon size={22} />
             </button>
 
-            <NavLink to="/" className="flex items-center gap-2.5 font-black text-lg tracking-tight text-[var(--color-powder-blue)] shrink-0">
+            <NavLink to="/" className="flex items-center gap-3 font-black text-xl tracking-tight text-[var(--color-powder-blue)] shrink-0">
               {company.data?.logoUrl ? (
-                <img src={company.data.logoUrl} alt="" className="h-8 w-8 rounded-xl object-cover" />
+                <img src={company.data.logoUrl} alt="" className="h-9 w-9 rounded-xl object-cover" />
               ) : (
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary)] text-xs font-extrabold text-white shadow-md">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-primary)] text-sm font-extrabold text-white shadow-md">
                   {company.data?.code?.slice(0, 2) || 'DF'}
                 </span>
               )}
@@ -78,7 +78,7 @@ export function AppShell() {
             </NavLink>
 
             {/* CENTER: Main Navigation Links */}
-            <nav className="ml-8 hidden items-center gap-6 lg:gap-8 md:flex h-full">
+            <nav className="ml-10 hidden items-center gap-7 lg:gap-8 md:flex h-full">
               {visibleItems.map((item) => (
                 <NavLink key={item.to} to={item.to} className={navLinkClass}>
                   {item.label}
@@ -88,7 +88,7 @@ export function AppShell() {
           </div>
 
           {/* RIGHT: Controls, Notification & User Profile */}
-          <div className="flex items-center gap-3 sm:gap-5">
+          <div className="flex items-center gap-5 sm:gap-6">
             {user?.employeeId && <CheckInWidget />}
             <NotificationBell />
 
@@ -99,12 +99,12 @@ export function AppShell() {
                 onClick={() => setMenuOpen((o) => !o)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2.5 rounded-xl p-1.5 hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none cursor-pointer"
+                className="flex items-center gap-3 rounded-2xl p-2 hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none cursor-pointer"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-alpha-12)] text-sm font-bold text-[var(--color-powder-blue)] border border-[var(--color-border)] shadow-sm">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-alpha-12)] text-base font-bold text-[var(--color-powder-blue)] border border-[var(--color-border)] shadow-sm">
                   {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
                 </span>
-                <span className="hidden text-sm font-bold text-[var(--color-text)] sm:inline">
+                <span className="hidden text-base font-bold text-[var(--color-text)] sm:inline">
                   {user?.firstName || user?.loginId}
                 </span>
                 <CaretDownIcon size={14} className="hidden text-[var(--color-text-muted)] sm:block" />
@@ -113,12 +113,12 @@ export function AppShell() {
               {menuOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 z-40 mt-2 w-52 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] py-2 shadow-2xl"
+                  className="absolute right-0 z-40 mt-2 w-56 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] py-2 shadow-2xl"
                 >
                   <button
                     type="button"
                     role="menuitem"
-                    className="block w-full px-4 py-2.5 text-left text-sm font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
+                    className="block w-full px-5 py-3 text-left text-sm font-bold text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
                     onClick={() => {
                       setMenuOpen(false);
                       navigate('/profile');
@@ -129,7 +129,7 @@ export function AppShell() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="block w-full px-4 py-2.5 text-left text-sm font-bold text-[#ff7b79] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
+                    className="block w-full px-5 py-3 text-left text-sm font-bold text-[#ff7b79] hover:bg-[var(--color-surface-hover)] focus-visible:outline-none cursor-pointer"
                     onClick={() => {
                       setMenuOpen(false);
                       logout();
@@ -144,7 +144,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="w-full max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 flex flex-col flex-1 min-h-[calc(100dvh-64px)] space-y-6 lg:space-y-8">
+      <main className="w-full px-6 sm:px-8 lg:px-12 xl:px-16 py-8 lg:py-10 flex flex-col flex-1 min-h-[calc(100dvh-72px)]">
         <Outlet />
       </main>
 

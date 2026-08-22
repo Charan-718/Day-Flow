@@ -50,9 +50,9 @@ export function NotificationBell() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
-        className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-white transition-colors cursor-pointer focus-visible:outline-none"
+        className="relative flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-background-deep)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)] hover:text-white transition-colors cursor-pointer focus-visible:outline-none shadow-sm"
       >
-        <BellIcon size={18} />
+        <BellIcon size={20} />
         {unread > 0 && (
           <span
             aria-hidden="true"
