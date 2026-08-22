@@ -21,6 +21,10 @@ export interface AuthUser {
   firstName?: string | null;
   lastName?: string | null;
   mustChangePassword?: boolean;
+  employee?: {
+    profilePictureUrl?: string | null;
+  };
+
 }
 
 export interface EmployeeListItem {

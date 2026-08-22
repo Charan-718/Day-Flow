@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDismissableMenu } from '../hooks/useDismissableMenu';
 import { getCompany } from '../services/company';
+import { getEmployee } from '../services/employees';
 import { CheckInWidget } from '../components/CheckInWidget';
 import { NotificationBell } from '../components/NotificationBell';
 import { Drawer } from '../components/Drawer';
@@ -39,6 +40,14 @@ export function AppShell() {
   const isAdmin = user?.role === 'HR_ADMIN';
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
   const company = useQuery({ queryKey: ['company'], queryFn: getCompany });
+
+  const { data: employeeData } = useQuery({
+    queryKey: ['employee', user?.employeeId],
+    queryFn: () => getEmployee(user!.employeeId!),
+    enabled: !!user?.employeeId,
+  });
+
+  const profilePictureUrl = (employeeData?.employee as any)?.profilePictureUrl || user?.employee?.profilePictureUrl;
 
   const menuRef = useRef<HTMLDivElement>(null);
   useDismissableMenu(menuRef, menuOpen, () => setMenuOpen(false));
@@ -102,8 +111,12 @@ export function AppShell() {
                 aria-expanded={menuOpen}
                 className="flex items-center gap-3 rounded-2xl p-2 hover:bg-[var(--color-surface-hover)] transition-colors focus-visible:outline-none cursor-pointer"
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-alpha-12)] text-base font-bold text-[var(--color-powder-blue)] border border-[var(--color-border)] shadow-sm">
-                  {(user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()}
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-alpha-12)] text-base font-bold text-[var(--color-powder-blue)] border border-[var(--color-border)] shadow-sm overflow-hidden">
+                  {profilePictureUrl ? (
+                    <img src={profilePictureUrl} alt="Avatar" className="h-full w-full object-cover" />
+                  ) : (
+                    (user?.firstName?.[0] || user?.email?.[0] || '?').toUpperCase()
+                  )}
                 </span>
                 <span className="hidden text-base font-bold text-[var(--color-text)] sm:inline">
                   {user?.firstName || user?.loginId}
