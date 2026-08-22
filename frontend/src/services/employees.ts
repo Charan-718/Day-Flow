@@ -23,6 +23,7 @@ export async function createEmployee(body: Record<string, unknown>) {
   return data.data as {
     loginId: string;
     temporaryPassword: string;
+    assignedRole?: string;
     employee: { id: string; firstName: string; lastName: string };
   };
 }

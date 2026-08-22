@@ -18,6 +18,7 @@ const emptyForm = {
   designation: '',
   departmentId: '',
   joiningDate: new Date().toISOString().slice(0, 10),
+  monthlyWage: '',
 };
 
 export function EmployeeDirectory() {
@@ -76,7 +77,7 @@ export function EmployeeDirectory() {
       setCreatedCreds({
         loginId: res.loginId,
         temporaryPassword: res.temporaryPassword,
-        assignedRole: (res as { assignedRole?: string }).assignedRole,
+        assignedRole: res.assignedRole,
       });
       showToast('success', `Employee created — Login ID ${res.loginId}`);
       void qc.invalidateQueries({ queryKey: ['employees'] });
@@ -176,9 +177,9 @@ export function EmployeeDirectory() {
                 </p>
                 <p className="font-mono text-xs text-[var(--muted)]">{emp.employeeCode}</p>
               </div>
-            </Link>
-          );
-        })}
+            </div>
+          </Link>
+        ))}
       </div>
 
       <Modal
@@ -290,52 +291,23 @@ export function EmployeeDirectory() {
                 value={form.joiningDate}
                 onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
               />
-            </div>
-            <input
-              required
-              type="email"
-              placeholder="Work email"
-              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-            <input
-              placeholder="Job position"
-              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
-              value={form.designation}
-              onChange={(e) => setForm({ ...form, designation: e.target.value })}
-            />
-            <select
-              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
-              value={form.departmentId}
-              onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
-            >
-              <option value="">Department</option>
-              {departments.data?.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-            <input
-              type="number"
-              min={0}
-              placeholder="Monthly wage (₹) — optional"
-              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
-              value={form.monthlyWage}
-              onChange={(e) => setForm({ ...form, monthlyWage: e.target.value })}
-            />
+            </label>
+            <label className="block text-sm">
+              <span className="mb-1.5 block font-medium text-[var(--ink)]">
+                Monthly wage (₹) <span className="font-normal text-[var(--muted)]">(optional)</span>
+              </span>
+              <input
+                type="number"
+                min={0}
+                className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                value={form.monthlyWage}
+                onChange={(e) => setForm({ ...form, monthlyWage: e.target.value })}
+              />
+            </label>
             <p className="text-xs text-[var(--muted)]">
               Role is assigned automatically: Human Resources → HR Admin, all other departments →
               Employee.
             </p>
-            <input
-              type="date"
-              required
-              className="w-full rounded-md border border-[var(--line)] px-3 py-2 text-sm"
-              value={form.joiningDate}
-              onChange={(e) => setForm({ ...form, joiningDate: e.target.value })}
-            />
             {create.isError && (
               <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
                 {getApiError(create.error).message}
