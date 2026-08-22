@@ -20,15 +20,15 @@ const NAV_ITEMS = [
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `relative flex items-center h-[72px] px-1 text-base font-bold transition-colors focus-visible:outline-none ${
     isActive
-      ? 'text-[var(--color-powder-blue)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--color-powder-blue)]'
-      : 'text-[var(--color-text-secondary)] hover:text-white'
+      ? 'text-[#8c3dff] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--color-powder-blue)]'
+      : 'text-[var(--color-text-secondary)] hover:text-[#8c3dff]'
   }`;
 
 const drawerNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   `flex h-12 items-center rounded-xl px-3 text-base font-bold transition-colors ${
     isActive
-      ? 'bg-[var(--color-primary-alpha-12)] text-[var(--color-powder-blue)]'
-      : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'
+      ? 'bg-[var(--color-primary-alpha-12)] text-[#8c3dff]'
+      : 'text-[var(--color-text)] hover:bg-[var(--color-surface-hover)] hover:text-[#8c3dff]'
   }`;
 
 export function AppShell() {
@@ -66,21 +66,22 @@ export function AppShell() {
               <MenuIcon size={22} />
             </button>
 
-            <NavLink to="/" className="flex items-center gap-3 font-black text-xl tracking-tight text-[var(--color-powder-blue)] shrink-0">
-              {company.data?.logoUrl ? (
-                <img src={company.data.logoUrl} alt="" className="h-9 w-9 rounded-xl object-cover" />
-              ) : (
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--color-primary)] text-sm font-extrabold text-white shadow-md">
-                  {company.data?.code?.slice(0, 2) || 'DF'}
-                </span>
-              )}
-              <span>{company.data?.name || 'DayFlow'}</span>
+            <NavLink to="/" className="flex items-center gap-3 shrink-0" style={{ textDecoration: 'none' }}>
+              <img src="/dayflow-logo.svg" alt="DayFlow Logo" className="h-9 w-9 rounded-xl object-cover" />
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>
+                Day<span style={{ color: 'var(--color-secondary)' }}>Flow</span>
+              </span>
             </NavLink>
 
             {/* CENTER: Main Navigation Links */}
             <nav className="ml-10 hidden items-center gap-7 lg:gap-8 md:flex h-full">
               {visibleItems.map((item) => (
-                <NavLink key={item.to} to={item.to} className={navLinkClass}>
+                <NavLink 
+                  key={item.to} 
+                  to={item.to} 
+                  className={navLinkClass}
+                  style={({ isActive }) => ({ color: isActive ? '#8c3dff' : undefined })}
+                >
                   {item.label}
                 </NavLink>
               ))}
@@ -172,8 +173,9 @@ export function AppShell() {
             <NavLink
               key={item.to}
               to={item.to}
-              className={drawerNavLinkClass}
               onClick={() => setMobileNavOpen(false)}
+              className={drawerNavLinkClass}
+              style={({ isActive }) => ({ color: isActive ? '#8c3dff' : undefined })}
             >
               {item.label}
             </NavLink>
