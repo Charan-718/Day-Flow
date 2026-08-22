@@ -629,7 +629,7 @@ function ProfileSkeleton() {
           <div key={i} className="h-4 w-16 animate-pulse rounded bg-[var(--line)]/60" />
         ))}
       </div>
-      <div className="rounded-lg border border-[var(--line)] bg-white p-5">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-xl">
         <div className="grid gap-5 sm:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="space-y-2">

@@ -89,50 +89,50 @@ export function Employee360Page() {
         ]}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)]">
-          <h2 className="mb-3 font-semibold text-[var(--ink)]">Profile</h2>
-          <dl className="grid grid-cols-2 gap-3 text-sm">
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="rounded-2xl border border-[var(--color-primary)]/50 bg-[var(--color-surface)] p-6 shadow-xl transition-all hover:border-[var(--color-primary-hover)] hover:shadow-[0_0_20px_rgba(140,61,255,0.3)]">
+          <h2 className="mb-4 text-base font-extrabold text-[var(--color-powder-blue)] tracking-tight">Profile</h2>
+          <dl className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <dt className="text-xs text-[var(--muted)]">Login</dt>
-              <dd className="font-mono text-[var(--ink)]">{d.profile.loginId}</dd>
+              <dt className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Login</dt>
+              <dd className="font-mono font-bold text-[var(--color-powder-blue)]">{d.profile.loginId}</dd>
             </div>
             <div>
-              <dt className="text-xs text-[var(--muted)]">Email</dt>
-              <dd className="text-[var(--ink)]">{d.profile.email}</dd>
+              <dt className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Email</dt>
+              <dd className="font-semibold text-[var(--color-primary-hover)]">{d.profile.email}</dd>
             </div>
             <div>
-              <dt className="text-xs text-[var(--muted)]">Department</dt>
-              <dd className="text-[var(--ink)]">{d.profile.department?.name || '—'}</dd>
+              <dt className="text-xs font-bold uppercase text-[var(--color-text-muted)]">Department</dt>
+              <dd className="font-semibold text-[var(--color-primary-hover)]">{d.profile.department?.name || '—'}</dd>
             </div>
           </dl>
         </section>
 
-        <section className="rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)]">
-          <h2 className="mb-3 font-semibold text-[var(--ink)]">Leave balances</h2>
+        <section className="rounded-2xl border border-[var(--color-primary)]/50 bg-[var(--color-surface)] p-6 shadow-xl transition-all hover:border-[var(--color-primary-hover)] hover:shadow-[0_0_20px_rgba(140,61,255,0.3)]">
+          <h2 className="mb-4 text-base font-extrabold text-[var(--color-powder-blue)] tracking-tight">Leave balances</h2>
           {d.leaveSnapshot.balances.length === 0 ? (
-            <p className="text-sm text-[var(--muted)]">No leave types configured.</p>
+            <p className="text-sm font-semibold text-[var(--color-text-muted)]">No leave types configured.</p>
           ) : (
-            <ul className="space-y-1.5 text-sm">
+            <ul className="space-y-2 text-sm">
               {d.leaveSnapshot.balances.map((b) => (
-                <li key={b.type} className="flex justify-between">
-                  <span className="text-[var(--ink)]">{b.type}</span>
-                  <span className="font-mono font-medium text-[var(--ink)]">{b.available} days</span>
+                <li key={b.type} className="flex justify-between border-b border-[var(--color-border)]/40 pb-2 last:border-0 last:pb-0">
+                  <span className="font-semibold text-[var(--color-primary-hover)]">{b.type}</span>
+                  <span className="font-mono font-bold text-[var(--color-powder-blue)]">{b.available} days</span>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        <section className="rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)]">
-          <h2 className="mb-3 font-semibold text-[var(--ink)]">Recent leave</h2>
+        <section className="rounded-2xl border border-[var(--color-primary)]/50 bg-[var(--color-surface)] p-6 shadow-xl transition-all hover:border-[var(--color-primary-hover)] hover:shadow-[0_0_20px_rgba(140,61,255,0.3)]">
+          <h2 className="mb-4 text-base font-extrabold text-[var(--color-powder-blue)] tracking-tight">Recent leave</h2>
           {d.leaveSnapshot.recentRequests.length === 0 ? (
             <EmptyState title="No requests yet" icon={<InboxIcon size={18} />} />
           ) : (
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-3 text-sm">
               {d.leaveSnapshot.recentRequests.map((r) => (
-                <li key={r.id} className="flex items-center justify-between gap-2">
-                  <span className="text-[var(--ink)]">
+                <li key={r.id} className="flex items-center justify-between gap-2 border-b border-[var(--color-border)]/40 pb-2 last:border-0 last:pb-0">
+                  <span className="font-semibold text-[var(--color-primary-hover)]">
                     {r.leaveType.name} · {formatDate(r.startDate)}
                   </span>
                   <StatusBadge status={r.status} />
@@ -142,18 +142,18 @@ export function Employee360Page() {
           )}
         </section>
 
-        <section className="rounded-lg border border-[var(--line)] bg-white p-4 shadow-[var(--shadow)]">
-          <h2 className="mb-3 font-semibold text-[var(--ink)]">Recent activity</h2>
+        <section className="rounded-2xl border border-[var(--color-primary)]/50 bg-[var(--color-surface)] p-6 shadow-xl transition-all hover:border-[var(--color-primary-hover)] hover:shadow-[0_0_20px_rgba(140,61,255,0.3)]">
+          <h2 className="mb-4 text-base font-extrabold text-[var(--color-powder-blue)] tracking-tight">Recent activity</h2>
           {d.recentActivity.length === 0 ? (
             <EmptyState title="No recorded activity" icon={<InboxIcon size={18} />} />
           ) : (
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-3 text-sm">
               {d.recentActivity.map((a) => (
-                <li key={a.id} className="text-[var(--ink)]">
-                  <span className="font-medium">{a.action}</span>
-                  <span className="text-[var(--muted)]">
+                <li key={a.id} className="border-b border-[var(--color-border)]/40 pb-2 text-[var(--color-text)] last:border-0 last:pb-0">
+                  <span className="font-bold text-[var(--color-primary-hover)]">{a.action}</span>
+                  <span className="text-[var(--color-text-secondary)]">
                     {' '}
-                    by <span className="font-mono">{a.actor.loginId}</span> ·{' '}
+                    by <span className="font-mono text-[var(--color-powder-blue)]">{a.actor.loginId}</span> ·{' '}
                     {new Date(a.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}
                   </span>
                 </li>

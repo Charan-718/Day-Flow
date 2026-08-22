@@ -563,7 +563,7 @@ function TableSkeleton({ isAdmin }: { isAdmin: boolean }) {
     <div
       aria-busy="true"
       aria-label="Loading time off requests"
-      className="overflow-hidden rounded-lg border border-[var(--line)] bg-white"
+      className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-xl"
     >
       <div className="border-b border-[var(--line)] bg-[var(--bg)] px-3 py-2.5">
         <div className="h-3 w-24 animate-pulse rounded bg-[var(--line)]" />

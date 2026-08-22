@@ -51,7 +51,7 @@ function WorkflowTrail({ request }: { request: LeaveRequest }) {
             className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
               step.done
                 ? 'border-[var(--accent)] bg-[var(--accent)]'
-                : 'border-[var(--border-control)] bg-white'
+                : 'border-[var(--color-border)] bg-[var(--color-background-deep)]'
             }`}
           >
             {step.done && (
