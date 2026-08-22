@@ -23,13 +23,14 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/change-password" element={<ChangePasswordPage />} />
-            </Route>
+      <ToastProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/change-password" element={<ChangePasswordPage />} />
+              </Route>
 
               <Route element={<RequireAuth />}>
                 <Route element={<AppShell />}>

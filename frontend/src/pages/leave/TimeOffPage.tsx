@@ -15,6 +15,7 @@ import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { StatusBadge } from '../../components/StatusBadge';
 import { LeaveCalendar } from '../../components/LeaveCalendar';
+import { CheckCircleIcon, InboxIcon, SearchOffIcon } from '../../components/icons';
 import {
   EmptyState,
   ErrorState,
@@ -225,7 +226,40 @@ export function TimeOffPage() {
         </div>
       )}
 
-      {requests.isLoading && <LoadingSkeleton />}
+      <div role="group" aria-label="Filter by status" className="mb-4 flex flex-wrap gap-1.5">
+        {STATUS_TABS.map((tab, i) => {
+          const count = countQueries[i]?.data;
+          const isActive = statusFilter === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              // aria-current, not aria-pressed — these are mutually exclusive filter
+              // options (one "current" selection), not independent toggle buttons.
+              aria-current={isActive ? 'true' : undefined}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 ${
+                isActive
+                  ? 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+                  : 'border-[var(--border-control)] bg-white text-[var(--muted)] hover:bg-[var(--bg)]'
+              }`}
+            >
+              {tab.label}
+              {typeof count === 'number' && (
+                <span
+                  className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-mono text-[11px] font-semibold ${
+                    isActive ? 'bg-[var(--accent)] text-white' : 'bg-[var(--bg)] text-[var(--muted)]'
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {requests.isLoading && <TableSkeleton isAdmin={isAdmin} />}
       {requests.isError && (
         <ErrorState message={getApiError(requests.error).message} onRetry={() => requests.refetch()} />
       )}

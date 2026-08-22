@@ -11,13 +11,6 @@ import { getApiError } from '../../api/client';
 
 type Tab = 'info' | 'resume' | 'private' | 'salary' | 'about' | 'security';
 
-const ALL_TABS: Array<{ key: Tab; label: string }> = [
-  { key: 'info', label: 'Info' },
-  { key: 'private', label: 'Private Info' },
-  { key: 'salary', label: 'Salary Info' },
-  { key: 'about', label: 'About' },
-];
-
 function formatCurrency(n: number) {
   return `₹${n.toLocaleString('en-IN')}`;
 }
@@ -71,7 +64,12 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
 
   const save = useMutation({
     mutationFn: () => {
-      const body: Record<string, unknown> = { ...draft };
+      // The backend rejects any field outside phone/address/profilePictureUrl for a
+      // self-edit (non-admin) — draft can carry more (admin fields get populated by
+      // startEditing() too), so scope what's actually sent by role.
+      const body: Record<string, unknown> = isAdmin
+        ? { ...draft }
+        : { phone: draft.phone, address: draft.address };
       if (typeof body.skills === 'string') {
         body.skills = body.skills
           .split(',')
@@ -142,7 +140,7 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
     setEditing(true);
   }
 
-  if (isLoading) return <LoadingSkeleton rows={8} />;
+  if (isLoading) return <ProfileSkeleton />;
   if (isError || !data) {
     return <ErrorState message={getApiError(error).message} onRetry={() => refetch()} />;
   }
@@ -163,6 +161,17 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
   // clicking it opened a Save/Cancel bar over read-only text.
   const editableOnThisTab = tab === 'info';
 
+  function handleTabKeyDown(e: KeyboardEvent<HTMLButtonElement>, currentKey: Tab) {
+    const idx = tabs.findIndex((t) => t.key === currentKey);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 1 : -1;
+      const next = tabs[(idx + delta + tabs.length) % tabs.length];
+      setTab(next.key);
+      document.getElementById(`profile-tab-${next.key}`)?.focus();
+    }
+  }
+
   return (
     <div>
       <PageHeader
@@ -175,7 +184,7 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
                 <Button variant="secondary">360° View</Button>
               </Link>
             )}
-            {canEdit && !editing && (
+            {canEdit && editableOnThisTab && !editing && (
               <Button variant="secondary" onClick={startEditing}>
                 Edit
               </Button>
@@ -386,8 +395,11 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
                 Recalculate salary
               </Button>
             </div>
-            {salary.isLoading && <LoadingSkeleton />}
-            {salary.data == null && !salary.isLoading && (
+            {salary.isLoading && <SalarySkeleton />}
+            {salary.isError && (
+              <ErrorState message={getApiError(salary.error).message} onRetry={() => salary.refetch()} />
+            )}
+            {!salary.isLoading && !salary.isError && salary.data == null && (
               <p className="text-sm text-[var(--muted)]">No salary structure configured.</p>
             )}
             {!salary.isLoading && !salary.isError && salary.data && (

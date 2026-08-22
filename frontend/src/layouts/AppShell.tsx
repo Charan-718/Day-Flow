@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useDismissableMenu } from '../hooks/useDismissableMenu';
 import { getCompany } from '../services/company';
 import { CheckInWidget } from '../components/CheckInWidget';
 import { NotificationBell } from '../components/NotificationBell';
@@ -36,13 +37,33 @@ export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const isAdmin = user?.role === 'HR_ADMIN';
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
   const company = useQuery({ queryKey: ['company'], queryFn: getCompany });
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  useDismissableMenu(menuRef, menuOpen, () => setMenuOpen(false));
+
+  async function handleLogout() {
+    setMenuOpen(false);
+    setMobileNavOpen(false);
+    await logout();
+    navigate('/login');
+  }
 
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-[var(--nav)] text-[var(--nav-text)]">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
-          <NavLink to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open navigation menu"
+            className="-ml-1 rounded-md p-2 text-[var(--nav-text)] hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nav)] md:hidden"
+          >
+            <MenuIcon size={22} />
+          </button>
+
+          <NavLink to="/" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
             {company.data?.logoUrl ? (
               <img src={company.data.logoUrl} alt="" className="h-7 w-7 rounded object-cover" />
             ) : (
