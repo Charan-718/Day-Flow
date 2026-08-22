@@ -16,6 +16,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showForgot, setShowForgot] = useState(false);
   // Only surface sign-up while no organisation exists — employees never self-register.
   const registration = useQuery({
     queryKey: ['registration-status'],
@@ -70,7 +71,16 @@ export function LoginPage() {
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block font-medium text-[var(--ink)]">Password</span>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <span className="font-medium text-[var(--ink)]">Password</span>
+            <button
+              type="button"
+              onClick={() => setShowForgot((v) => !v)}
+              className="rounded text-xs font-medium text-[var(--accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+            >
+              Forgot password?
+            </button>
+          </div>
           <input
             type="password"
             className="w-full rounded-md border border-[var(--border-control)] px-3 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
@@ -80,6 +90,12 @@ export function LoginPage() {
             required
           />
         </label>
+        {showForgot && (
+          <p className="rounded-md bg-[var(--info-soft)] px-3 py-2 text-sm text-[var(--info)]">
+            There's no self-service reset. Ask your HR administrator to generate a new
+            temporary password from your profile's Security tab.
+          </p>
+        )}
         {error && (
           <p role="alert" className="rounded-md bg-[var(--danger-soft)] px-3 py-2 text-sm text-[var(--danger)]">
             {error}

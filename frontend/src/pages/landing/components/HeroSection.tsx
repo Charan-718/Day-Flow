@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import SquareLoader from './SquareLoader';
 
-export default function HeroSection({ onOpenDemo }: { onOpenDemo: () => void }) {
+const DEMO_URL = 'https://drive.google.com/drive/folders/1v-TmT90R80MpL3KweY0_ie3kXrwHCmLz?usp=sharing';
+
+export default function HeroSection() {
   const [autoRotate, setAutoRotate] = useState(true);
   const [activeRole, setActiveRole] = useState('admin');
   const [cameraTheta, setCameraTheta] = useState(0);
@@ -352,12 +354,18 @@ export default function HeroSection({ onOpenDemo }: { onOpenDemo: () => void }) 
                 </svg>
               </a>
 
-              <button onClick={onOpenDemo} className="landing-btn-secondary" style={{ padding: '0.65rem 1.4rem', fontSize: '0.9rem' }}>
+              <a
+                href={DEMO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="landing-btn-secondary"
+                style={{ padding: '0.65rem 1.4rem', fontSize: '0.9rem' }}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
                 Watch Product Tour
-              </button>
+              </a>
             </div>
           </div>
 

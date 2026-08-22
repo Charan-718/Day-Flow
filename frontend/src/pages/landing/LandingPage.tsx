@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './landing.css';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -9,7 +8,6 @@ import PricingSection from './components/PricingSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import FaqSection from './components/FaqSection';
 import Footer from './components/Footer';
-import DemoModal from './components/DemoModal';
 import { RoleEntry } from './RoleEntry';
 
 /**
@@ -19,16 +17,14 @@ import { RoleEntry } from './RoleEntry';
  * rules are scoped to it (see landing.css) so they cannot leak into authenticated screens.
  */
 export function LandingPage() {
-  const [demoOpen, setDemoOpen] = useState(false);
-
   return (
     <div
       className="dayflow-landing landing-bg-grid-pattern"
       style={{ minHeight: '100vh', background: 'var(--color-background)' }}
     >
-      <Navbar onOpenDemo={() => setDemoOpen(true)} />
+      <Navbar />
       <main>
-        <HeroSection onOpenDemo={() => setDemoOpen(true)} />
+        <HeroSection />
         <FeaturesSection />
         <WorkflowBuilder />
         <RoiCalculator />
@@ -38,7 +34,6 @@ export function LandingPage() {
         <RoleEntry />
       </main>
       <Footer />
-      <DemoModal isOpen={demoOpen} onClose={() => setDemoOpen(false)} />
     </div>
   );
 }

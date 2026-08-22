@@ -74,10 +74,16 @@ export function TimeOffPage() {
     queryKey: ['leave-requests', statusFilter],
     queryFn: () => listLeaveRequests(statusFilter === 'ALL' ? undefined : { status: statusFilter }),
   });
-  const calendarYear = new Date().getFullYear();
+  // Dedicated, unfiltered fetch for the calendar — it must always show every request
+  // regardless of the status-filter tabs above, which only scope the table/card list.
+  const calendarRequests = useQuery({
+    queryKey: ['leave-requests', 'calendar'],
+    queryFn: () => listLeaveRequests({ pageSize: 100 }),
+    enabled: !isAdmin,
+  });
   const holidays = useQuery({
-    queryKey: ['public-holidays', calendarYear],
-    queryFn: () => getPublicHolidays(calendarYear),
+    queryKey: ['public-holidays'],
+    queryFn: () => getPublicHolidays(),
     enabled: !isAdmin,
   });
 
@@ -99,7 +105,9 @@ export function TimeOffPage() {
   const totalAllCount = countQueries[0]?.data;
 
   const reviewingRequest: LeaveRequest | null =
-    requests.data?.items.find((r) => r.id === reviewingId) ?? null;
+    requests.data?.items.find((r) => r.id === reviewingId) ??
+    calendarRequests.data?.items.find((r) => r.id === reviewingId) ??
+    null;
 
   const selectedType = types.data?.find((t) => t.id === form.leaveTypeId);
   const dateRangeInvalid = Boolean(
@@ -212,15 +220,20 @@ export function TimeOffPage() {
         />
       )}
 
-      {!isAdmin && requests.data && (
+      {!isAdmin && (
         <div className="mb-6">
-          {holidays.isLoading ? (
+          {holidays.isLoading || calendarRequests.isLoading ? (
             <LoadingSkeleton rows={4} />
           ) : (
             <LeaveCalendar
-              year={calendarYear}
-              requests={requests.data.items}
+              requests={calendarRequests.data?.items || []}
               holidays={holidays.data || []}
+              onViewRequest={(id) => setReviewingId(id)}
+              onRequestDate={(dateStr) => {
+                setForm({ ...emptyForm, startDate: dateStr, endDate: dateStr, daysRequested: 1 });
+                setRequestModalOpen(true);
+                create.reset();
+              }}
             />
           )}
         </div>

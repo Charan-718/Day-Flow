@@ -168,6 +168,53 @@ export async function changePassword(
 }
 
 
+/**
+ * HR-mediated password reset — there's no email service configured, so there's no
+ * self-service "forgot password" flow. Instead an HR Admin generates a fresh temporary
+ * password from the employee's profile and relays it to them directly; the account is
+ * forced to change it on next login, same as a freshly provisioned employee.
+ */
+export async function resetEmployeePassword(
+  employeeId: string,
+  actorId: string,
+  actorRole: Role,
+  ipAddress?: string
+) {
+  if (actorRole !== Role.HR_ADMIN) {
+    throw new AppError('Only HR Admin can reset a password', 'FORBIDDEN', 403);
+  }
+
+  const employee = await prisma.employee.findUnique({
+    where: { id: employeeId },
+    include: { user: { select: { id: true, loginId: true, email: true } } },
+  });
+  if (!employee) throw new AppError('Employee not found', 'NOT_FOUND', 404);
+
+  const tempPassword = generateTempPassword();
+  const passwordHash = await bcrypt.hash(tempPassword, env.BCRYPT_ROUNDS);
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: employee.user.id },
+      data: { passwordHash, mustChangePassword: true },
+    });
+
+    await writeAuditLog(tx, {
+      actorId,
+      action: 'PASSWORD_RESET',
+      entityType: 'User',
+      entityId: employee.user.id,
+      ipAddress,
+    });
+  });
+
+  return {
+    loginId: employee.user.loginId,
+    email: employee.user.email,
+    temporaryPassword: tempPassword,
+  };
+}
+
 /** Allocates a company code, retrying on collision since Company.code is unique. */
 async function reserveCompanyCode(base: string, tx: Prisma.TransactionClient): Promise<string> {
   for (let i = 0; i < 50; i += 1) {

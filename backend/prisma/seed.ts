@@ -398,27 +398,46 @@ interface SeedPerson {
   isHr: boolean;
 }
 
-async function generatePeople(depts: Record<string, { id: string; isHrTeam: boolean }>, now: Date) {
+/** FNV-1a — deterministic so the same (dept, designation) slot always hashes to the same
+ * name/tenure across seed runs. `generatePeople` used to pick these with Math.random(),
+ * which meant every reseed (container restart, `RUN_SEED_ON_START=true`) generated a fresh
+ * random name per role and createEmployee's existing-email check never recognized it as the
+ * same slot — each restart silently added a full new set of duplicate employees. */
+function stableHash(str: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+function generatePeople(depts: Record<string, { id: string; isHrTeam: boolean }>, now: Date) {
   const usedNames = new Set<string>();
   const people: SeedPerson[] = [];
 
   for (const dept of Object.keys(DEPT_ROLES)) {
     const roles = DEPT_ROLES[dept];
     for (const role of roles) {
+      const baseSeed = `${dept}::${role.designation}`;
       let firstName = '';
       let lastName = '';
       let gender: 'Male' | 'Female' = 'Male';
       let key = '';
+      let salt = 0;
       do {
-        gender = Math.random() < 0.5 ? 'Male' : 'Female';
-        firstName = pick(gender === 'Male' ? FIRST_NAMES_M : FIRST_NAMES_F);
-        lastName = pick(LAST_NAMES);
+        const pool = stableHash(`${baseSeed}:gender:${salt}`) % 2 === 0 ? FIRST_NAMES_M : FIRST_NAMES_F;
+        gender = pool === FIRST_NAMES_M ? 'Male' : 'Female';
+        firstName = pool[stableHash(`${baseSeed}:first:${salt}`) % pool.length];
+        lastName = LAST_NAMES[stableHash(`${baseSeed}:last:${salt}`) % LAST_NAMES.length];
         key = `${firstName}${lastName}`;
+        salt++;
       } while (usedNames.has(key));
       usedNames.add(key);
 
       // Leads joined earliest (up to 4 years ago); individual contributors more recently.
-      const daysAgo = role.isLead ? randomInt(500, 1500) : randomInt(30, 1100);
+      const tenureRoll = stableHash(`${baseSeed}:tenure`);
+      const daysAgo = role.isLead ? 500 + (tenureRoll % 1000) : 30 + (tenureRoll % 1070);
       const joiningDate = addDays(now, -daysAgo);
 
       people.push({
@@ -702,7 +721,7 @@ async function seedRealisticOrganisation(
   console.log('SEED_DEMO_DATA=true — building a realistic demo organisation…');
 
   const now = new Date();
-  const people = await generatePeople(depts, now);
+  const people = generatePeople(depts, now);
 
   // Prefer an existing HR admin (bootstrap or otherwise) as the reviewer/actor on
   // generated leave approvals and audit entries — falls back to the first HR person

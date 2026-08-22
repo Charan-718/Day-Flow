@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { getEmployee, getSalary, updateEmployee } from '../../services/employees';
+import { resetEmployeePassword } from '../../services/auth';
 import { updateSalaryFromWage } from '../../services/payroll';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../components/Toast';
@@ -84,6 +85,16 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
       setEditing(false);
       showToast('success', 'Profile updated');
       void qc.invalidateQueries({ queryKey: ['employee', employeeId] });
+    },
+    onError: (err) => showToast('error', getApiError(err).message),
+  });
+
+  const [resetResult, setResetResult] = useState<{ temporaryPassword: string } | null>(null);
+  const resetPassword = useMutation({
+    mutationFn: () => resetEmployeePassword(employeeId),
+    onSuccess: (data) => {
+      setResetResult({ temporaryPassword: data.temporaryPassword });
+      showToast('success', 'Password reset — share the temporary password with the employee');
     },
     onError: (err) => showToast('error', getApiError(err).message),
   });
@@ -542,6 +553,34 @@ export function EmployeeProfile({ self }: { self?: boolean }) {
                 >
                   Change password →
                 </Link>
+              </div>
+            )}
+            {isAdmin && !isSelf && (
+              <div className="sm:col-span-2 border-t border-[var(--line)] pt-4">
+                <p className="mb-2 text-sm font-medium text-[var(--ink)]">Reset password</p>
+                <p className="mb-3 text-xs text-[var(--muted)]">
+                  There's no self-service reset — generate a new temporary password and share
+                  it with {String(emp.firstName || 'the employee')} directly. They'll be
+                  required to set their own password on next login.
+                </p>
+                <Button
+                  variant="secondary"
+                  onClick={() => resetPassword.mutate()}
+                  loading={resetPassword.isPending}
+                >
+                  Reset password
+                </Button>
+                {resetResult && (
+                  <div className="mt-3 rounded-md border border-[var(--line)] bg-[var(--accent-soft)] px-3 py-2.5">
+                    <p className="text-xs font-medium text-[var(--muted)]">Temporary password</p>
+                    <p className="mt-0.5 font-mono text-sm text-[var(--ink)]">
+                      {resetResult.temporaryPassword}
+                    </p>
+                    <p className="mt-1.5 text-xs text-[var(--muted)]">
+                      Share this now — it won't be shown again.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </dl>
