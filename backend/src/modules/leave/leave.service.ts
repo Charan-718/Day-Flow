@@ -79,9 +79,23 @@ export async function createLeaveRequest(
     );
   }
 
-  const daysRequested = input.daysRequested ?? daysBetweenInclusive(startDate, endDate);
+  // daysRequested is client-supplied, so it must be reconciled with the actual range:
+  // otherwise a month-long absence could be booked while consuming half a day of balance.
+  const spanDays = daysBetweenInclusive(startDate, endDate);
+  const daysRequested = input.daysRequested ?? spanDays;
   if (daysRequested <= 0) {
     throw new AppError('Days requested must be positive', 'VALIDATION_ERROR', 400);
+  }
+  // Must stay consistent with the selected period. The band allows a half-day at each end
+  // of the range (a real HR case) while blocking the abuse of booking a long absence that
+  // only debits a fraction of a day from the balance.
+  const minDays = Math.max(0.5, spanDays - 1);
+  if (daysRequested > spanDays || daysRequested < minDays) {
+    throw new AppError(
+      `Days requested (${daysRequested}) must be between ${minDays} and ${spanDays} for the selected period`,
+      'VALIDATION_ERROR',
+      400
+    );
   }
 
   const employeeId = actor.employeeId;

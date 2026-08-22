@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uploadUrlSchema } from '../../utils/uploadUrl';
 
 export const createLeaveSchema = z.object({
   leaveTypeId: z.string().uuid(),
@@ -6,7 +7,7 @@ export const createLeaveSchema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   daysRequested: z.coerce.number().positive().optional(),
   remarks: z.string().max(1000).optional(),
-  attachmentUrl: z.string().url().optional().or(z.literal('')),
+  attachmentUrl: uploadUrlSchema.optional().or(z.literal('')),
 });
 
 export const reviewLeaveSchema = z.object({

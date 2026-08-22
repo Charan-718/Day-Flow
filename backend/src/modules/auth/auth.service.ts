@@ -5,9 +5,15 @@ import { prisma } from '../../config/prisma';
 import { env } from '../../config/env';
 import { AppError } from '../../utils/errors';
 import { signToken } from '../../utils/jwt';
-import { generateEmployeeCode, generateLoginId } from '../../utils/loginIdGenerator';
-import { parseDateOnly } from '../../utils/dates';
+import {
+  buildEmployeeCodeParts,
+  buildLoginIdParts,
+  deriveCompanyCode,
+  withUniqueRetry,
+} from '../../utils/loginIdGenerator';
+import { parseDateOnly, todayUtc } from '../../utils/dates';
 import { writeAuditLog } from '../../utils/auditWriter';
+import { saveBase64File } from '../../utils/fileStore';
 import { resolveEmployeeRole } from '../../utils/roleResolver';
 import { calculateSalaryComponents } from '../../utils/salaryCalculator';
 import { z } from 'zod';
@@ -15,6 +21,7 @@ import {
   changePasswordSchema,
   createEmployeeSchema,
   loginSchema,
+  registerSchema,
   verifyEmailSchema,
 } from './auth.schema';
 
@@ -22,6 +29,7 @@ type LoginInput = z.infer<typeof loginSchema>;
 type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+type RegisterInput = z.infer<typeof registerSchema>;
 
 function generateTempPassword(): string {
   return crypto.randomBytes(16).toString('base64url').slice(0, 16);
@@ -159,6 +167,149 @@ export async function changePassword(
   return { ok: true };
 }
 
+
+/** Allocates a company code, retrying on collision since Company.code is unique. */
+async function reserveCompanyCode(base: string, tx: Prisma.TransactionClient): Promise<string> {
+  for (let i = 0; i < 50; i += 1) {
+    const candidate = i === 0 ? base : `${base.slice(0, 3)}${i}`;
+    const clash = await tx.company.findUnique({ where: { code: candidate } });
+    if (!clash) return candidate;
+  }
+  throw new AppError('Could not allocate a company code', 'ID_ALLOCATION_FAILED', 503);
+}
+
+/**
+ * Public HR / company sign-up.
+ *
+ * This is the only unauthenticated way an account can be created, and it is restricted to
+ * bootstrapping the very first company + its HR Admin. Once a company exists the endpoint
+ * refuses, so employees can never self-register — they must be provisioned by an HR Admin
+ * through createEmployee(), which is the path that generates their Login ID.
+ */
+export async function register(input: RegisterInput, ipAddress?: string) {
+  const existingCompany = await prisma.company.findFirst();
+  if (existingCompany) {
+    throw new AppError(
+      'This workspace already has an organisation. Ask your HR Admin for an account.',
+      'REGISTRATION_CLOSED',
+      403
+    );
+  }
+
+  const email = input.email.trim().toLowerCase();
+  if (await prisma.user.findUnique({ where: { email } })) {
+    throw new AppError('Email already in use', 'EMAIL_EXISTS', 409);
+  }
+
+  const companyName = input.companyName.trim();
+  const joiningDate = todayUtc();
+  const passwordHash = await bcrypt.hash(input.password, env.BCRYPT_ROUNDS);
+
+  // Persist the logo before opening the transaction so a bad image fails fast with a 400
+  // rather than aborting a partially-built organisation.
+  let logoUrl: string | null = null;
+  if (input.companyLogoBase64 && input.companyLogoFileName) {
+    logoUrl = saveBase64File(input.companyLogoFileName, input.companyLogoBase64, {
+      imagesOnly: true,
+      maxBytes: 2 * 1024 * 1024,
+    }).url;
+  }
+
+  const created = await prisma.$transaction(async (tx) => {
+    const code = await reserveCompanyCode(deriveCompanyCode(companyName), tx);
+
+    const company = await tx.company.create({
+      data: { name: companyName, code, logoUrl },
+    });
+
+    // HR team department so roleResolver keeps classifying later HR hires correctly.
+    const hrDepartment = await tx.department.upsert({
+      where: { name: 'Human Resources' },
+      create: { name: 'Human Resources', isHrTeam: true },
+      update: { isHrTeam: true },
+    });
+
+    const initials = `${input.firstName.replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase().padEnd(2, 'X')}${input.lastName
+      .replace(/[^a-zA-Z]/g, '')
+      .slice(0, 2)
+      .toUpperCase()
+      .padEnd(2, 'X')}`;
+    const loginId = `${code}${initials}${joiningDate.getUTCFullYear()}0001`;
+
+    // The founder signs up with their own password, so nothing is system-generated and
+    // there is no forced rotation (unlike provisioned employees).
+    const user = await tx.user.create({
+      data: {
+        loginId,
+        email,
+        passwordHash,
+        role: Role.HR_ADMIN,
+        status: AccountStatus.ACTIVE,
+        mustChangePassword: false,
+        emailVerifiedAt: new Date(),
+      },
+    });
+
+    const employee = await tx.employee.create({
+      data: {
+        userId: user.id,
+        firstName: input.firstName.trim(),
+        lastName: input.lastName.trim(),
+        employeeCode: `EMP${joiningDate.getUTCFullYear()}0001`,
+        phone: input.phone.trim(),
+        departmentId: hrDepartment.id,
+        designation: 'HR Admin',
+        joiningDate,
+      },
+    });
+
+    await ensureDefaultLeaveBalances(tx, employee.id);
+
+    await writeAuditLog(tx, {
+      actorId: user.id,
+      action: 'COMPANY_REGISTERED',
+      entityType: 'Company',
+      entityId: company.id,
+      newValue: { companyName, code, loginId },
+      ipAddress,
+    });
+
+    return { user, employee, company };
+  });
+
+  const token = signToken({
+    userId: created.user.id,
+    role: created.user.role,
+    employeeId: created.employee.id,
+  });
+
+  // Never echo the password back.
+  return {
+    token,
+    user: {
+      id: created.user.id,
+      loginId: created.user.loginId,
+      email: created.user.email,
+      role: created.user.role,
+      employeeId: created.employee.id,
+      firstName: created.employee.firstName,
+      lastName: created.employee.lastName,
+      mustChangePassword: false,
+    },
+    company: {
+      name: created.company.name,
+      code: created.company.code,
+      logoUrl: created.company.logoUrl,
+    },
+  };
+}
+
+/** True when no organisation exists yet, i.e. the sign-up screen should be reachable. */
+export async function registrationOpen() {
+  const company = await prisma.company.findFirst();
+  return { open: !company };
+}
+
 export async function createEmployee(
   input: CreateEmployeeInput,
   actorId: string,
@@ -183,12 +334,32 @@ export async function createEmployee(
     actorRole,
   });
 
-  const loginId = await generateLoginId(input.firstName, input.lastName, joiningDate);
-  const employeeCode = await generateEmployeeCode(joiningDate);
+  const loginIdParts = await buildLoginIdParts(input.firstName, input.lastName, joiningDate);
+  const employeeCodeParts = await buildEmployeeCodeParts(joiningDate);
   const tempPassword = input.temporaryPassword || generateTempPassword();
   const passwordHash = await bcrypt.hash(tempPassword, env.BCRYPT_ROUNDS);
 
-  const result = await prisma.$transaction(async (tx) => {
+  // The unique index on User.loginId is the real concurrency guard: if two admins create
+  // an employee at the same moment one insert loses with P2002 and retries on the next
+  // serial, so duplicate Login IDs cannot be issued.
+  const result = await withUniqueRetry(
+    loginIdParts.build,
+    loginIdParts.firstSerial,
+    (loginId) =>
+      prisma.$transaction(async (tx) => {
+    const employeeCode = await (async () => {
+      const taken = await tx.employee.findMany({
+        where: { employeeCode: { startsWith: employeeCodeParts.prefix } },
+        select: { employeeCode: true },
+        orderBy: { employeeCode: 'desc' },
+        take: 1,
+      });
+      const next = taken.length
+        ? parseInt(taken[0].employeeCode.slice(employeeCodeParts.prefix.length), 10) + 1
+        : employeeCodeParts.firstSerial;
+      return employeeCodeParts.build(Number.isNaN(next) ? employeeCodeParts.firstSerial : next);
+    })();
+
     const user = await tx.user.create({
       data: {
         loginId,
@@ -245,7 +416,8 @@ export async function createEmployee(
     });
 
     return { user, employee, temporaryPassword: tempPassword, assignedRole: role };
-  });
+      })
+  );
 
   return {
     loginId: result.user.loginId,

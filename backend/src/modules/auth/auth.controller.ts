@@ -59,3 +59,20 @@ export async function changePassword(req: Request, res: Response, next: NextFunc
     return next(err);
   }
 }
+
+export async function register(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await authService.register(req.body, req.clientIp);
+    return sendSuccess(res, data, 'Organisation created', 201);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function registrationStatus(_req: Request, res: Response, next: NextFunction) {
+  try {
+    return sendSuccess(res, await authService.registrationOpen(), 'OK');
+  } catch (err) {
+    return next(err);
+  }
+}

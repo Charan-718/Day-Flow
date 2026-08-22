@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uploadUrlSchema } from '../../utils/uploadUrl';
 
 export const listEmployeesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
@@ -10,7 +11,7 @@ export const updateEmployeeSchema = z
   .object({
     phone: z.string().optional().nullable(),
     address: z.string().optional().nullable(),
-    profilePictureUrl: z.string().url().optional().nullable().or(z.literal('')),
+    profilePictureUrl: uploadUrlSchema.optional().nullable().or(z.literal('')),
     firstName: z.string().min(1).optional(),
     lastName: z.string().min(1).optional(),
     personalEmail: z.string().email().optional().nullable().or(z.literal('')),

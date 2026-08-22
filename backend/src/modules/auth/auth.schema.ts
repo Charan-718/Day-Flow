@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { uploadUrlSchema } from '../../utils/uploadUrl';
 
 export const loginSchema = z.object({
   email: z.string().email().or(z.string().min(3)),
@@ -14,6 +15,42 @@ export const changePasswordSchema = z.object({
     .regex(/[a-z]/, 'Must include a lowercase letter')
     .regex(/[0-9]/, 'Must include a number'),
 });
+
+
+const strongPassword = z
+  .string()
+  .min(12, 'Password must be at least 12 characters')
+  .regex(/[A-Z]/, 'Must include an uppercase letter')
+  .regex(/[a-z]/, 'Must include a lowercase letter')
+  .regex(/[0-9]/, 'Must include a number');
+
+/**
+ * HR / company registration. This is the ONLY public account-creation path — regular
+ * employees are provisioned by an HR Admin via POST /api/auth/employees and can never
+ * self-register (enforced in auth.service.register by refusing once a company exists).
+ */
+export const registerSchema = z
+  .object({
+    companyName: z.string().min(2, 'Company name is required').max(120),
+    // Sent inline (base64) rather than pre-uploaded: /api/files requires auth and no
+    // session exists yet during sign-up. Validated + persisted server-side by register().
+    companyLogoFileName: z.string().max(200).optional(),
+    companyLogoBase64: z.string().max(8_000_000).optional(),
+    firstName: z.string().min(1, 'First name is required').max(80),
+    lastName: z.string().min(1, 'Last name is required').max(80),
+    email: z.string().email('Enter a valid email address'),
+    phone: z
+      .string()
+      .min(7, 'Enter a valid phone number')
+      .max(20)
+      .regex(/^[0-9+\-\s()]+$/, 'Phone may only contain digits and + - ( )'),
+    password: strongPassword,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export const createEmployeeSchema = z.object({
   firstName: z.string().min(1).max(80),

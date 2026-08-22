@@ -1,0 +1,504 @@
+/*
+ * Landing-page styles, ported from the standalone DayFlow-landing-page app.
+ *
+ * SCOPING: the original stylesheet restyled `body`, `*` and `:root` globally. Vite's plain
+ * CSS imports are unscoped and never removed on unmount, so once this loads (visiting `/`)
+ * it stays in the document for the rest of the session — every one of those global rules
+ * would otherwise leak into every authenticated screen. All of it (custom properties, the
+ * universal box-sizing/margin/padding reset, the scrollbar rules) is now re-scoped under
+ * `.dayflow-landing` (applied by LandingPage). Some `--color-*`/`--font-*` names here
+ * really do collide with the app's own tokens (e.g. --shadow-md/--shadow-lg in index.css),
+ * which is exactly what caused fonts/shadows/spacing to change app-wide after visiting the
+ * landing page — do not move any of this back onto a bare `:root`.
+ */
+/* 
+  ==========================================================================
+  DayFlow Centralized CSS Design Token System (Light Theme Palette)
+  Palette:
+  - Alabaster Grey (#E0E4E8 / #F4F7FA) -> Main Light Canvas & Background
+  - Powder Blue (#9ABFD8) -> Hero Background Accents, Card Highlights & Ambient Tints
+  - Night Bordeaux (#5E191A) -> High Impact Buttons, Typography, Logos & Badges
+  ==========================================================================
+*/
+
+.dayflow-landing {
+  /* Scoped to .dayflow-landing (not :root) — these names collide with tokens the rest of
+     the app already defines (e.g. --shadow-md/--shadow-lg in index.css), and a bare :root
+     block from a plain CSS import leaks globally for the whole session since Vite never
+     unmounts route-level stylesheets. Custom properties inherit, so descendants still
+     resolve var(--color-*) etc. normally. */
+  /* USER PALETTE CORE CONSTANTS */
+  --color-night-bordeaux: #5E191A;
+  --color-powder-blue: #9ABFD8;
+  --color-alabaster-grey: #E0E4E8;
+
+  /* Powder Blue Tonal Scale */
+  --color-powder-blue-light: #EBF3F8;
+  --color-powder-blue-card: #E0ECF4;
+  --color-powder-blue-dark: #6C9BBB;
+
+  /* Night Bordeaux Tonal Scale */
+  --color-bordeaux-main: #5E191A;
+  --color-bordeaux-hover: #7E2224;
+  --color-bordeaux-deep: #3A0C0D;
+  --color-bordeaux-alpha-08: rgba(94, 25, 26, 0.08);
+  --color-bordeaux-alpha-15: rgba(94, 25, 26, 0.15);
+  --color-bordeaux-alpha-30: rgba(94, 25, 26, 0.3);
+
+  /* Alabaster & Clean Light Backgrounds */
+  --color-alabaster-canvas: #F4F7FA;
+  --color-alabaster-alt: #E8EEF4;
+  --color-alabaster-card: #FFFFFF;
+
+  /* ==========================================================================
+     1. SEMANTIC COLOR TOKENS (LIGHT ALABASTER & POWDER BLUE THEME)
+     ========================================================================== */
+
+  /* Primary Action & Brand (Night Bordeaux for High Contrast) */
+  --color-primary: #5E191A;
+  --color-primary-hover: #7E2224;
+  --color-primary-alpha-12: rgba(94, 25, 26, 0.12);
+  --color-primary-alpha-30: rgba(94, 25, 26, 0.3);
+
+  /* Secondary Accents (Powder Blue) */
+  --color-secondary: #6C9BBB;
+  --color-secondary-hover: #4E7C9C;
+  --color-accent-cyan: #2A7B88;
+  --color-accent-cyan-alpha-12: rgba(42, 123, 136, 0.12);
+  --color-accent-cyan-alpha-30: rgba(42, 123, 136, 0.3);
+  --color-accent-pink: #C24A53;
+  --color-accent-violet-light: #5E191A;
+
+  /* Status Colors */
+  --color-success: #1F8A4C;
+  --color-success-alpha-15: rgba(31, 138, 76, 0.15);
+  --color-success-alpha-30: rgba(31, 138, 76, 0.3);
+  --color-warning: #D97706;
+  --color-warning-alpha-12: rgba(217, 119, 6, 0.12);
+  --color-warning-alpha-30: rgba(217, 119, 6, 0.3);
+  --color-error: #DC2626;
+  --color-info: #2563EB;
+
+  /* Background Colors (Dominant Light Alabaster Canvas with Powder Blue Tints) */
+  --color-background: var(--color-alabaster-canvas);
+  --color-background-alt: var(--color-alabaster-alt);
+  --color-background-deep: #D6E0E9;
+  --color-background-grid: rgba(94, 25, 26, 0.05);
+
+  /* Surface / Container Colors (White Cards with Powder Blue Borders) */
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #F8FAFC;
+  --color-surface-nav: rgba(244, 247, 250, 0.92);
+  --color-surface-glass: rgba(255, 255, 255, 0.85);
+
+  /* Text Colors (High Contrast Night Bordeaux & Slate) */
+  --color-text: #1E293B;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748B;
+  --color-text-dark: #0F172A;
+  --color-text-white: #FFFFFF;
+  --color-heading: #5E191A;
+
+  /* Border Colors */
+  --color-border: #CBD5E1;
+  --color-border-light: #E2E8F0;
+  --color-border-focus: var(--color-night-bordeaux);
+
+  /* ==========================================================================
+     2. GRADIENTS
+     ========================================================================== */
+  --gradient-primary: linear-gradient(135deg, #5E191A 0%, #7E2224 50%, #9ABFD8 100%);
+  --gradient-vibrant: linear-gradient(135deg, #9ABFD8 0%, #5E191A 50%, #7E2224 100%);
+  --gradient-text: linear-gradient(135deg, #5E191A 0%, #7E2224 60%, #1E293B 100%);
+  --gradient-edge: linear-gradient(90deg, #5E191A, #9ABFD8, #7E2224, #5E191A);
+
+  /* ==========================================================================
+     3. TYPOGRAPHY
+     ========================================================================== */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+
+  --font-size-xs: 0.75rem;       /* 12px */
+  --font-size-sm: 0.875rem;      /* 14px */
+  --font-size-base: 1rem;        /* 16px */
+  --font-size-md: 1.618rem;      /* ~25.9px */
+  --font-size-lg: 2.618rem;      /* ~41.9px */
+  --font-size-xl: 4.236rem;      /* ~67.8px */
+  --font-size-display: 5.5rem;   /* Hero Headline */
+
+  --leading-tight: 1.15;
+  --leading-normal: 1.618;
+  --leading-loose: 1.8;
+
+  /* ==========================================================================
+     4. SPACING
+     ========================================================================== */
+  --spacing-xs: 0.25rem;         /* 4px */
+  --spacing-sm: 0.5rem;          /* 8px */
+  --spacing-md: 1rem;            /* 16px */
+  --spacing-lg: 1.5rem;          /* 24px */
+  --spacing-xl: 2.5rem;          /* 40px */
+  --spacing-2xl: 4rem;           /* 64px */
+
+  /* ==========================================================================
+     5. BORDERS & RADIUS
+     ========================================================================== */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* ==========================================================================
+     6. SHADOWS & GLOWS
+     ========================================================================== */
+  --shadow-sm: 0 2px 4px rgba(94, 25, 26, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(94, 25, 26, 0.1);
+  --shadow-lg: 0 20px 30px -10px rgba(94, 25, 26, 0.15);
+  --shadow-card: 0 15px 35px rgba(94, 25, 26, 0.08);
+  --glow-primary: 0 0 30px rgba(94, 25, 26, 0.2);
+  --glow-cyan: 0 0 30px rgba(154, 191, 216, 0.4);
+  --glow-vibrant: 0 0 35px rgba(94, 25, 26, 0.25);
+
+  /* ==========================================================================
+     BACKWARDS COMPATIBILITY ALIASES
+     ========================================================================== */
+  --bg-dominant: var(--color-background);
+  --bg-dominant-alt: var(--color-background-alt);
+  --bg-grid-line: var(--color-background-grid);
+  --surface-card: var(--color-surface);
+  --surface-card-hover: var(--color-surface-hover);
+  --surface-nav: var(--color-surface-nav);
+  --surface-glass: var(--color-surface-glass);
+  --border-secondary: var(--color-border);
+  --border-secondary-light: var(--color-border-light);
+  --accent-primary: var(--color-primary);
+  --accent-secondary: var(--color-secondary);
+  --accent-cyan: var(--color-accent-cyan);
+  --accent-emerald: var(--color-success);
+  --accent-amber: var(--color-warning);
+  --accent-pink: var(--color-accent-pink);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --text-dark: var(--color-text-dark);
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-md: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-display: var(--font-size-display);
+}
+
+/* GLOBAL RESETS & BASE STYLES — scoped to .dayflow-landing, see note above */
+.dayflow-landing, .dayflow-landing *, .dayflow-landing *::before, .dayflow-landing *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+.dayflow-landing {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND GRID PATTERN */
+.landing-bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, var(--color-background-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-background-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* GOLDEN RATIO TYPOGRAPHY CLASSES */
+.dayflow-landing h1, .dayflow-landing h2, .dayflow-landing h3, .dayflow-landing h4, .dayflow-landing h5, .dayflow-landing h6 {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  color: var(--color-heading);
+  letter-spacing: -0.025em;
+}
+
+.landing-text-display {
+  font-size: clamp(2.8rem, 6vw, var(--font-size-display));
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+.landing-text-xl {
+  font-size: clamp(2rem, 4vw, var(--font-size-xl));
+}
+
+.landing-text-lg {
+  font-size: clamp(1.5rem, 3vw, var(--font-size-lg));
+}
+
+.landing-text-md {
+  font-size: clamp(1.2rem, 2vw, var(--font-size-md));
+}
+
+.landing-text-base {
+  font-size: var(--font-size-base);
+}
+
+.landing-text-gradient {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.landing-text-gradient-vibrant {
+  background: var(--gradient-vibrant);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* CARD CONTAINERS */
+.landing-vibrant-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-vibrant-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-primary);
+  opacity: 0.8;
+  transition: opacity 0.35s ease;
+}
+
+.landing-vibrant-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-night-bordeaux);
+  box-shadow: var(--shadow-lg);
+}
+
+.landing-vibrant-card:hover::before {
+  opacity: 1;
+}
+
+/* GLOWING BORDER CONTAINER */
+.landing-glowing-border-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: var(--gradient-edge);
+  background-size: 300% 300%;
+  animation: borderGlowRotate 8s ease infinite;
+}
+
+@keyframes borderGlowRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.landing-glowing-border-inner {
+  background: var(--color-surface);
+  border-radius: calc(var(--radius-lg) - 1px);
+  height: 100%;
+  width: 100%;
+}
+
+/* BUTTONS WITH NIGHT BORDEAUX ACCENT */
+.landing-btn-primary {
+  background: var(--color-night-bordeaux);
+  color: var(--color-text-white);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-base);
+  box-shadow: 0 10px 25px -5px rgba(94, 25, 26, 0.4);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.landing-btn-primary:hover {
+  background: var(--color-bordeaux-hover);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 15px 35px -5px rgba(94, 25, 26, 0.6);
+  color: #FFFFFF;
+}
+
+.landing-btn-secondary {
+  background: rgba(94, 25, 26, 0.05);
+  color: var(--color-night-bordeaux);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-base);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.landing-btn-secondary:hover {
+  background: rgba(94, 25, 26, 0.1);
+  border-color: var(--color-night-bordeaux);
+  color: var(--color-bordeaux-hover);
+  transform: translateY(-2px);
+}
+
+/* BADGES */
+.landing-badge-vibrant {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+  background: rgba(94, 25, 26, 0.08);
+  border: 1px solid rgba(94, 25, 26, 0.25);
+  color: var(--color-night-bordeaux);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+/* ANIMATION UTILITIES */
+.landing-animate-float {
+  animation: floatSubtle 6s ease-in-out infinite;
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.landing-animate-pulse-slow {
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* CUSTOM SCROLLBAR — scoped to .dayflow-landing, see note above */
+.dayflow-landing ::-webkit-scrollbar {
+  width: 10px;
+}
+
+.dayflow-landing ::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.dayflow-landing ::-webkit-scrollbar-thumb {
+  background: var(--color-powder-blue);
+  border-radius: 5px;
+}
+
+.dayflow-landing ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-night-bordeaux);
+}
+
+/* SQUARE LOADER ANIMATIONS */
+@keyframes squareSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes squarePulse {
+  0% { transform: scale(0.6); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* HIDE DEFAULT MODEL VIEWER PROGRESS BAR LINE */
+model-viewer::part(default-progress-bar) {
+  display: none !important;
+}
+
+
+
+/* ── Role entry (sign-in chooser) ─────────────────────────────────────────── */
+.role-entry-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  max-width: 62rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .role-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.role-entry-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 14px);
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.role-entry-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-night-bordeaux);
+  box-shadow: var(--glow-primary);
+}
+
+.role-entry-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.15rem;
+  background: var(--color-night-bordeaux);
+  color: var(--color-text-white);
+}
+
+.role-entry-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 17rem;
+}
+
+.role-entry-card .landing-btn-primary,
+.role-entry-card .landing-btn-secondary {
+  width: 100%;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .role-entry-card { transition: none; }
+  .role-entry-card:hover { transform: none; }
+}

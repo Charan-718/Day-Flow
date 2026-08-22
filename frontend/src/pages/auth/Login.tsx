@@ -1,5 +1,7 @@
 import { type FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getRegistrationStatus } from '../../services/auth';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../../components/Button';
 import { getApiError } from '../../api/client';
@@ -7,9 +9,19 @@ import { getApiError } from '../../api/client';
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  // Set by the landing page's role buttons — tailors copy and the sign-up affordance.
+  // Purely presentational: the real role always comes from the server on login.
+  const [params] = useSearchParams();
+  const asHr = params.get('role') === 'hr';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  // Only surface sign-up while no organisation exists — employees never self-register.
+  const registration = useQuery({
+    queryKey: ['registration-status'],
+    queryFn: getRegistrationStatus,
+    retry: false,
+  });
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: FormEvent) {
@@ -36,9 +48,13 @@ export function LoginPage() {
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--accent)] text-lg font-bold text-white">
           Df
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {asHr ? 'Admin / HR sign in' : 'Employee sign in'}
+        </h1>
         <p className="mt-1 text-sm text-[var(--muted)]">
-          Use the Login ID or email provided by HR
+          {asHr
+            ? 'Manage your organisation, people and approvals'
+            : 'Use the Login ID or email provided by HR'}
         </p>
       </div>
 
@@ -74,8 +90,34 @@ export function LoginPage() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-xs text-[var(--muted)]">
-        Accounts are provisioned by HR only — there is no public sign-up.
+      {asHr && registration.data?.open ? (
+        <p className="mt-6 text-center text-sm text-[var(--muted)]">
+          Setting up a new organisation?{' '}
+          <Link
+            to="/signup"
+            className="rounded font-medium text-[var(--accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          >
+            Create your company
+          </Link>
+        </p>
+      ) : asHr ? (
+        <p className="mt-6 text-center text-xs text-[var(--muted)]">
+          An organisation is already set up for this workspace — sign in with your HR account
+          above.
+        </p>
+      ) : (
+        <p className="mt-6 text-center text-xs text-[var(--muted)]">
+          Employee accounts are provisioned by HR — there is no public sign-up.
+        </p>
+      )}
+
+      <p className="mt-4 text-center text-sm">
+        <Link
+          to="/"
+          className="rounded text-[var(--muted)] hover:text-[var(--ink)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+        >
+          ← Back to home
+        </Link>
       </p>
     </div>
   );
