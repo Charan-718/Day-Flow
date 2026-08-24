@@ -46,7 +46,7 @@ export function LoginPage() {
     <div className="landing-vibrant-card relative flex min-h-[90vh] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-8 sm:p-12 lg:p-16 shadow-2xl">
       {/* Top Header */}
       <div className="text-center pt-2">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-night-bordeaux)] text-white shadow-[var(--glow-primary)] border border-[var(--color-night-bordeaux)] overflow-hidden">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-surface)] text-white shadow-[var(--glow-primary)] border border-[var(--color-night-bordeaux)] overflow-hidden">
           <img src="/dayflow-logo.svg" alt="DayFlow Logo" className="h-full w-full object-cover" />
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-[var(--color-heading)] mb-3">
