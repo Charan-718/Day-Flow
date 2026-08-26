@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDismissableMenu } from '../hooks/useDismissableMenu';
-import { getCompany } from '../services/company';
+// import { getCompany } from '../services/company';
 import { getEmployee } from '../services/employees';
 import { CheckInWidget } from '../components/CheckInWidget';
 import { NotificationBell } from '../components/NotificationBell';
@@ -39,7 +39,7 @@ export function AppShell() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const isAdmin = user?.role === 'HR_ADMIN';
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
-  const company = useQuery({ queryKey: ['company'], queryFn: getCompany });
+  // const company = useQuery({ queryKey: ['company'], queryFn: getCompany });
 
   const { data: employeeData } = useQuery({
     queryKey: ['employee', user?.employeeId],
